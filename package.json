@@ -1,0 +1,46 @@
+{
+  "name": "mall-velocity-fe",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "cross-env ENV_NAME=dev vite",
+    "start:fat": "cross-env ENV_NAME=fat vite",
+    "start:uat": "cross-env ENV_NAME=uat vite",
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=4096 vite build",
+    "build:fat": "cross-env NODE_OPTIONS=--max_old_space_size=4096 ENV_NAME=fat vite build",
+    "build:uat": "cross-env NODE_OPTIONS=--max_old_space_size=4096 ENV_NAME=uat vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,tsx,ts,less,md,json}": [
+      "prettier --write"
+    ],
+    "src/**/*.{js,ts,jsx,tsx}": [
+      "eslint --no-inline-config --ext .js,.jsx,.ts,.tsx"
+    ]
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.5.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.26.1",
+    "vite": "^6.3.1"
+  }
+}
