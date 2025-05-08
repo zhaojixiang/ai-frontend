@@ -1,21 +1,20 @@
 /// <reference types="vite/client" />
 
-import { OS } from '../packages/lib-os/index.d.ts';
+import { OS } from './lib/os/index';
 
 declare global {
-	interface Window {
-		JOJO: {
-			os: OS;
-		};
-	}
+  interface Window {
+    JOJO: {
+      os: OS;
+    };
+    sensors: any;
+    sensorsExpoSure: any;
+  }
 
-	const JOJO: {
-		os: OS;
-		Utils: any;
-	};
+  const JOJO: {
+    os: OS;
+    Utils: any;
+  };
 }
 
-declare module '*.less' {
-	const classes: { [key: string]: string };
-	export default classes;
-}
+declare module 'postcss-px-to-viewport';

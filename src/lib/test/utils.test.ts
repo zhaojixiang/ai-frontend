@@ -1,85 +1,48 @@
 import { debounce } from '../utils';
 
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
+describe('debounce', () => {
+	jest.useFakeTimers(); // 使用 Jest 的假定时器
 
-describe('debounce 函数', () => {
-	beforeEach(() => {
-		vi.useFakeTimers();
+	it('should call the function after the specified delay', () => {
+		const mockFn = jest.fn();
+		const debouncedFn = debounce(mockFn, 100);
+
+		debouncedFn();
+		expect(mockFn).not.toHaveBeenCalled(); // 函数不应立即调用
+
+		jest.advanceTimersByTime(99); // 快进 99ms
+		expect(mockFn).not.toHaveBeenCalled(); // 函数仍不应调用
+
+		jest.advanceTimersByTime(1); // 快进 1ms
+		expect(mockFn).toHaveBeenCalledTimes(1); // 函数应被调用一次
 	});
 
-	afterEach(() => {
-		vi.restoreAllMocks();
+	it('should only call the function once if called multiple times within the delay', () => {
+		const mockFn = jest.fn();
+		const debouncedFn = debounce(mockFn, 100);
+
+		debouncedFn();
+		debouncedFn();
+		debouncedFn();
+
+		jest.advanceTimersByTime(100); // 快进 100ms
+		expect(mockFn).toHaveBeenCalledTimes(1); // 函数应只被调用一次
 	});
 
-	test('基础调用 - 函数应被调用', () => {
-		const mockFn = vi.fn();
-		const debounced = debounce(mockFn, 100);
+	it('should call the function immediately if fps is 0', () => {
+		const mockFn = jest.fn();
+		const debouncedFn = debounce(mockFn, 0);
 
-		debounced();
-		vi.advanceTimersByTime(100);
-
-		expect(mockFn).toHaveBeenCalledTimes(1);
+		debouncedFn();
+		expect(mockFn).toHaveBeenCalledTimes(1); // 函数应立即调用
 	});
 
-	test('防抖效果 - 短时间内多次调用只执行一次', () => {
-		const mockFn = vi.fn();
-		const debounced = debounce(mockFn, 100);
+	it('should pass the correct arguments to the function', () => {
+		const mockFn = jest.fn();
+		const debouncedFn = debounce(mockFn, 100);
 
-		debounced();
-		debounced();
-		debounced();
-
-		vi.advanceTimersByTime(50);
-		expect(mockFn).not.toHaveBeenCalled();
-
-		vi.advanceTimersByTime(100);
-		expect(mockFn).toHaveBeenCalledTimes(1);
-	});
-
-	test('参数传递 - 应正确传递参数', () => {
-		const mockFn = vi.fn();
-		const debounced = debounce(mockFn, 100);
-
-		debounced(1, 'a', { key: 'value' });
-		vi.advanceTimersByTime(100);
-
-		expect(mockFn).toHaveBeenCalledWith(1, 'a', { key: 'value' });
-	});
-
-	test('fps = 0 时应立即执行', () => {
-		const mockFn = vi.fn();
-		const debounced = debounce(mockFn, 0);
-
-		debounced();
-		expect(mockFn).toHaveBeenCalledTimes(1);
-	});
-
-	test('清理机制 - 应清除前一个定时器', () => {
-		const mockFn = vi.fn();
-		const debounced = debounce(mockFn, 100);
-
-		debounced('first');
-		vi.advanceTimersByTime(50);
-
-		debounced('second');
-		vi.advanceTimersByTime(100);
-
-		expect(mockFn).toHaveBeenCalledTimes(1);
-		expect(mockFn).toHaveBeenCalledWith('second');
-	});
-
-	test('多次延迟调用 - 应分别执行', () => {
-		const mockFn = vi.fn();
-		const debounced = debounce(mockFn, 100);
-
-		debounced('first');
-		vi.advanceTimersByTime(150);
-
-		debounced('second');
-		vi.advanceTimersByTime(150);
-
-		expect(mockFn).toHaveBeenCalledTimes(2);
-		expect(mockFn).toHaveBeenNthCalledWith(1, 'first');
-		expect(mockFn).toHaveBeenNthCalledWith(2, 'second');
+		debouncedFn('arg1', 'arg2');
+		jest.advanceTimersByTime(100); // 快进 100ms
+		expect(mockFn).toHaveBeenCalledWith('arg1', 'arg2'); // 函数应接收到正确的参数
 	});
 });

@@ -13,7 +13,7 @@ export const AUTH_SIGN_URL =
  * 商城服务基础域名
  */
 const MALL_SERVICE_URL_BASE =
-	process.env.MALL_SERVICE_URL_BASE || JOJO.os.matrixH5
+	process.env.MALL_SERVICE_URL_BASE || JOJO.os.matrix
 		? `https://api-${envName}.cdssylkj.com/mall`
 		: `https://api${env}.tinman.cn/mall`;
 

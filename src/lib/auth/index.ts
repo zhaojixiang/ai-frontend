@@ -1,5 +1,12 @@
-import type { AuthorizeType } from '.';
+import type { AuthorizeType } from './index.d';
 import { AUTH_SIGN_URL } from '../../services/config';
+import Cookies from 'js-cookie';
+
+/**
+ * 获取授权页面地址
+ * @param {AuthorizeType} param0 - 授权参数
+ * @returns {string} - 授权页面地址
+ */
 export function toAuthrize({
 	appId,
 	mode,
@@ -31,3 +38,10 @@ export function toAuthrize({
 	].join('');
 	return redirectUrl;
 }
+
+/**
+ * 是否登录
+ */
+export const isLogin = (): boolean => {
+	return !!Cookies.get('authToken');
+};

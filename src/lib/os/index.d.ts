@@ -4,17 +4,17 @@ export interface OS {
 	 */
 	version: number;
 	/**
-	 * 是叫叫H5
+	 * 当前 H5环境 是叫叫
 	 */
-	jojoH5: boolean;
+	jojo: boolean;
 	/**
-	 * 是jojoupH5
+	 * 当前 H5环境 是jojoup
 	 */
-	jojoupH5: boolean;
+	jojoup: boolean;
 	/**
-	 * 是矩阵H5
+	 * 当前 H5环境 是矩阵
 	 */
-	matrixH5: boolean;
+	matrix: boolean;
 	/**
 	 * 是APP
 	 */
