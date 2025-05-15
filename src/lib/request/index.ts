@@ -1,14 +1,15 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Toast } from 'antd-mobile';
-import { whiteList } from './config';
-import { isLogin } from '../auth';
+import whiteApi from './whiteApi';
+import { isLogin, toAuthrize } from '../auth';
+import { serviceUrl } from '@/services/config';
 
-const BASE_URL = '/api';
 const TIMEOUT = 10000;
 
-const instance = axios.create({
-  baseURL: BASE_URL,
+const instance: AxiosInstance = axios.create({
+  baseURL: serviceUrl, // 默认值 baseUrl
   timeout: TIMEOUT,
+  method: 'get',
   withCredentials: true
 });
 
@@ -16,7 +17,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     // 未登录拦截
-    if (!isLogin() && !whiteList.includes(config.url || '')) {
+    if (!isLogin() && !whiteApi.includes(config.url || '')) {
       Toast.show({ icon: 'fail', content: '请先登录' });
       return Promise.reject(new Error('未登录或登录已过期'));
     }
@@ -32,27 +33,35 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   (response: AxiosResponse) => {
-    const { code, data, message } = response.data;
+    const { resultCode, data, errorMsg } = response.data;
 
-    if (code === 0) {
-      return data;
+    // 请求成功
+    if (resultCode === 200) {
+      return response.data;
     }
+
     // 未登录
-    if ([1001, 1005].includes(code)) {
-      const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
-      Toast.show({ icon: 'fail', content: '请先登录' });
-      setTimeout(() => {
-        if (JOJO?.os?.app) {
-          JOJO.Utils.jojoAppDirectLogin('');
-          return data;
-        }
-        window.location.href = `/login?redirect=${currentPath}`;
-      }, 800);
-      return Promise.reject(new Error('未登录或登录已过期'));
+    if ([1001, 1005].includes(resultCode)) {
+      Toast.show({ icon: 'fail', content: errorMsg || '未登录' });
+      Promise.reject(new Error(errorMsg || '未登录'));
+      return response.data;
     }
 
-    Toast.show({ icon: 'fail', content: message || '请求出错' });
-    return Promise.reject(new Error(message || '请求失败'));
+    // 需获取openId
+    if ([1002].includes(resultCode)) {
+      Toast.show({ icon: 'fail', content: errorMsg || '需要获取openId' });
+      // const redirectUrl = toAuthrize({
+      //   appId: data.authWechatAppId,
+      //   mode: 3,
+      //   wechatAuthType: 2
+      // });
+      // window.location.replace(redirectUrl);
+      Promise.reject(new Error(errorMsg || '需要获取openId'));
+      return response.data;
+    }
+
+    Toast.show({ icon: 'fail', content: errorMsg || '请求出错' });
+    Promise.reject(new Error(errorMsg || '请求失败'));
   },
   (error) => {
     Toast.show({ icon: 'fail', content: error.message || '网络错误' });
@@ -60,8 +69,18 @@ instance.interceptors.response.use(
   }
 );
 
-const request = <T = any>(config: AxiosRequestConfig): Promise<T> => {
-  return instance(config);
+const request = <T = any>(
+  dataOrParams: any, // 第一个参数：接口所需的参数
+  config: AxiosRequestConfig = {} // 第二个参数：其他配置
+): Promise<T> => {
+  // 根据请求方法决定将参数放在 data 还是 params
+  const method = config.method?.toLowerCase() || 'get';
+  const finalConfig: AxiosRequestConfig = {
+    ...config,
+    [method === 'get' ? 'params' : 'data']: dataOrParams
+  };
+
+  return instance(finalConfig) as Promise<T>;
 };
 
 export default request;

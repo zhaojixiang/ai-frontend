@@ -3,13 +3,11 @@ import type { ConfigEnv, UserConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import legacy from '@vitejs/plugin-legacy';
 import pxtovw from 'postcss-px-to-viewport';
+import istanbul from 'jojo-plugin-istanbul-vite';
 import url from '@rollup/plugin-url';
 import path from 'path';
 
-// import { createStyleImportPlugin } from 'vite-plugin-style-import';
-
-// // https://vite.dev/config/
-
+// https://vite.dev/config/
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   const env = loadEnv(mode, process.cwd(), '');
 
@@ -24,10 +22,6 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     },
     assetsInclude: ['**/*.svga'],
     plugins: [
-      // {
-      // 	...viteESLint(),
-      // 	apply: 'serve'
-      // },
       react({
         // 按需加载
         babel: {
@@ -44,15 +38,6 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
           ]
         }
       }),
-      // createStyleImportPlugin({
-      // 	libs: [
-      // 		{
-      // 			libraryName: 'antd-mobile',
-      // 			esModule: true,
-      // 			resolveStyle: (name) => `antd-mobile/es/components/${name}/${name}.css`
-      // 		}
-      // 	]
-      // }),
       legacy({
         targets: [
           'Android >= 39',
@@ -63,14 +48,8 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
           'ie >= 11'
         ],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime']
-      })
-      // vitePluginImport([
-      // 	{
-      // 		libraryName: 'antd-mobile-v2',
-      // 		style: true
-      // 	}
-      // ]),
-      // istanbul({ exclude: [] }),
+      }),
+      istanbul({ exclude: [] })
       // htmlPlugin()
     ],
     resolve: {
@@ -132,30 +111,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   };
 
   // 注入外部变量
-  const whiteKeys = [
-    'APP_NAME',
-    'SENSORS_SEVER_URL',
-    'ACT_URL',
-    'CDN_DOMAIN',
-    'ENV_NAME',
-    'CDN_PREFIX',
-    'ENV_BASE',
-    'MOCK',
-    'IS_OFFLINE_PACKAGE',
-    'BASE_URL',
-    'EDU_BASE_URL',
-    'COMMON_BASE_URL',
-    'MALL_BASE_URL',
-    'OSS_STATIC_RESOURCE',
-    'SZ_BASE_URL',
-    'WX_APPID',
-    'UC_BASE_URL',
-    'AUTH_SIGN_URL',
-    'SENTRY_BASE_URL',
-    'DESIGN_BASE_URL',
-    'SENSORS_BASE_URL',
-    'MINIAPP_ORIGINAL_ID'
-  ];
+  const whiteKeys = ['APP_NAME'];
   Object.keys(process.env).forEach((item) => {
     if (whiteKeys.includes(item)) {
       process.env[`VITE_${item}`] = process.env[item];
@@ -176,7 +132,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         open: true,
         host: '0.0.0.0',
         // proxy: proxy(ENV_NAME),
-        port: 8003
+        port: 3000
       }
     };
   }
@@ -188,6 +144,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
 
     config = {
       ...config,
+      // TODO：需与运维确认cdn地址及路由，并在wuxia进行配置
       base: CDN_DOMAIN && CDN_PREFIX ? `${CDN_DOMAIN}${CDN_PREFIX}` : '/',
       define: {
         'process.env.NODE_ENV': '"production"'

@@ -1,6 +1,7 @@
 import type { AuthorizeType } from './index.d';
-import { AUTH_SIGN_URL } from '../../services/config';
+import { AUTH_SIGN_URL } from '@/services/config';
 import Cookies from 'js-cookie';
+import qs from 'query-string';
 
 /**
  * 获取授权页面地址
@@ -8,40 +9,30 @@ import Cookies from 'js-cookie';
  * @returns {string} - 授权页面地址
  */
 export function toAuthrize({
-	appId,
-	mode,
-	wechatAuthType,
-	authBizType,
-	requestUrl
+  appId,
+  mode,
+  wechatAuthType,
+  authBizType,
+  requestUrl
 }: AuthorizeType) {
-	// 跳转参数拼接
-	const url = requestUrl || window.location.href;
-	// 重定向地址添加type类型
-	const authWechatAppId = appId ? `authWechatAppId=${appId}&` : '';
-	const modeStr = mode ? `mode=${mode}&` : '';
-	const wechatAuthTypeStr = wechatAuthType ? `wechatAuthType=${wechatAuthType}&` : '';
-	const authBizTypeStr = authBizType ? `authBizType=${authBizType}&` : '';
-	// 获取班期id
-	const classIds = localStorage.getItem('classIdStr') || '';
-	const classIdStr = classIds ? `dubbleAccountLoginClassIds=${classIds}&` : '';
+  const url = requestUrl || window.location.href;
+  const classIds = localStorage.getItem('classIdStr') || '';
 
-	const redirectUrl = [
-		AUTH_SIGN_URL,
-		'?',
-		modeStr,
-		authWechatAppId,
-		wechatAuthTypeStr,
-		authBizTypeStr,
-		classIdStr,
-		'requestUrl=',
-		encodeURIComponent(url)
-	].join('');
-	return redirectUrl;
+  const queryParams = qs.stringify({
+    mode,
+    authWechatAppId: appId,
+    wechatAuthType,
+    authBizType,
+    dubbleAccountLoginClassIds: classIds,
+    requestUrl: encodeURIComponent(url)
+  });
+
+  return `${AUTH_SIGN_URL}?${queryParams}`;
 }
 
 /**
  * 是否登录
  */
 export const isLogin = (): boolean => {
-	return !!Cookies.get('authToken');
+  return !!Cookies.get('authToken');
 };
