@@ -1,8 +1,10 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Toast } from 'antd-mobile';
-import whiteApi from './whiteApi';
-import { isLogin, toAuthrize } from '../auth';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+
 import { serviceUrl } from '@/services/config';
+
+import { isLogin } from '../auth';
+import whiteApi from './whiteApi';
 
 const TIMEOUT = 10000;
 
@@ -33,7 +35,7 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   (response: AxiosResponse) => {
-    const { resultCode, data, errorMsg } = response.data;
+    const { resultCode, errorMsg } = response.data;
 
     // 请求成功
     if (resultCode === 200) {
@@ -62,6 +64,7 @@ instance.interceptors.response.use(
 
     Toast.show({ icon: 'fail', content: errorMsg || '请求出错' });
     Promise.reject(new Error(errorMsg || '请求失败'));
+    return {};
   },
   (error) => {
     Toast.show({ icon: 'fail', content: error.message || '网络错误' });

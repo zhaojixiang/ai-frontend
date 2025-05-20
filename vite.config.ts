@@ -1,15 +1,20 @@
-import { defineConfig, loadEnv } from 'vite';
-import type { ConfigEnv, UserConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import legacy from '@vitejs/plugin-legacy';
-import pxtovw from 'postcss-px-to-viewport';
-import istanbul from 'jojo-plugin-istanbul-vite';
 import url from '@rollup/plugin-url';
+import legacy from '@vitejs/plugin-legacy';
+import react from '@vitejs/plugin-react';
+import viteESLint from '@xianzhengquan/vite-eslint-plugin';
+import istanbul from 'jojo-plugin-istanbul-vite';
 import path from 'path';
+import pxtovw from 'postcss-px-to-viewport';
+import type { ConfigEnv, UserConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
+import eslint from 'vite-plugin-eslint';
 
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
-  const env = loadEnv(mode, process.cwd(), '');
+  // 本地调试
+  const envDir = path.resolve(__dirname, 'envs');
+  const env = loadEnv(mode, envDir);
+  console.log(22222, env);
 
   let config: UserConfig = {
     clearScreen: false,
@@ -22,6 +27,17 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     },
     assetsInclude: ['**/*.svga'],
     plugins: [
+      // eslint({
+      //   // 设置为 true 时，在终端中抛出 ESLint 错误
+      //   throwOnWarning: false,
+      //   throwOnError: true, // 控制是否抛出 ESLint 错误
+      //   include: ['src/**/*.ts', 'src/**/*.tsx'], // 自定义检查范围
+      //   exclude: ['node_modules', '.eslintrc.cjs']
+      // }),
+      {
+        ...viteESLint(),
+        apply: 'serve'
+      },
       react({
         // 按需加载
         babel: {
@@ -148,7 +164,8 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       base: CDN_DOMAIN && CDN_PREFIX ? `${CDN_DOMAIN}${CDN_PREFIX}` : '/',
       define: {
         'process.env.NODE_ENV': '"production"'
-      }
+      },
+      envDir
     };
   }
 

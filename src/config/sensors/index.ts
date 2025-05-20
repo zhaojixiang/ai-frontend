@@ -1,6 +1,4 @@
 import sensors from '@woulsl-tools/sensors';
-import Exposure from './exposure';
-
 export const initSensors = () => {
   let platform = '其他';
   const envName = import.meta.env.VITE_ENV_NAME;
@@ -25,12 +23,6 @@ export const initSensors = () => {
   } else {
     server_url = 'https://sensors.tinman.cn/sa?project=default';
   }
-
-  window.sensorsExpoSure = sensors.use(Exposure, {
-    area_rate: 0,
-    stay_duration: 0,
-    repeated: true
-  });
 
   // 注册sensors
   sensors.tinmanSensorsInit({

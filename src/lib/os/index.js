@@ -1,8 +1,7 @@
-let os = {};
-const userAgent = window.navigator.userAgent;
+const { userAgent } = window.navigator;
 const app = /JoJo(Version|WebViewVersion)/i.test(window.navigator.userAgent);
 
-os = {
+const os = {
   // 是APP（包含：叫叫识字、叫叫绘本、叫叫口算、叫叫儿童阅读、jojoup）
   get app() {
     return app;

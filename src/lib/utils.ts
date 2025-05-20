@@ -6,17 +6,17 @@
  * @returns {function}
  */
 export function debounce(fn: (...args: any[]) => void, fps = 60) {
-	let ST: NodeJS.Timeout | null = null;
-	return (...args: any[]) => {
-		if (fps > 0) {
-			clearTimeout(ST!);
-			ST = setTimeout(() => {
-				fn(...args);
-			}, fps);
-		} else {
-			fn(...args);
-		}
-	};
+  let ST: NodeJS.Timeout | null = null;
+  return (...args: any[]) => {
+    if (fps > 0) {
+      clearTimeout(ST!);
+      ST = setTimeout(() => {
+        fn(...args);
+      }, fps);
+    } else {
+      fn(...args);
+    }
+  };
 }
 
 /**
@@ -26,18 +26,18 @@ export function debounce(fn: (...args: any[]) => void, fps = 60) {
  * @returns {Function}
  */
 export function throttle(fn: (...args: any[]) => void, fps = 60) {
-	let disabled = false;
+  let disabled = false;
 
-	return (...args: any[]) => {
-		if (!disabled) {
-			disabled = true;
-			fn(...args);
+  return (...args: any[]) => {
+    if (!disabled) {
+      disabled = true;
+      fn(...args);
 
-			setTimeout(() => {
-				disabled = false;
-			}, fps);
-		}
-	};
+      setTimeout(() => {
+        disabled = false;
+      }, fps);
+    }
+  };
 }
 
 /**
@@ -47,28 +47,28 @@ export function throttle(fn: (...args: any[]) => void, fps = 60) {
  * @returns {function}
  */
 export function frequency(fn: (...args: any[]) => void, fps = 60) {
-	let time = 0;
-	let now = time;
-	let ST: NodeJS.Timeout | null = null;
-	const newFn = (...args: any[]) => {
-		clearTimeout(ST!);
-		now = Date.now();
-		const distance = now - time;
+  let time = 0;
+  let now = time;
+  let ST: NodeJS.Timeout | null = null;
+  const newFn = (...args: any[]) => {
+    clearTimeout(ST!);
+    now = Date.now();
+    const distance = now - time;
 
-		if (distance >= fps) {
-			time = now;
-			fn(...args);
-		} else {
-			ST = setTimeout(() => {
-				newFn(...args);
-			}, distance);
-		}
-	};
-	return newFn;
+    if (distance >= fps) {
+      time = now;
+      fn(...args);
+    } else {
+      ST = setTimeout(() => {
+        newFn(...args);
+      }, distance);
+    }
+  };
+  return newFn;
 }
 
 export default {
-	debounce,
-	throttle,
-	frequency
+  debounce,
+  throttle,
+  frequency
 };
