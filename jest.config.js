@@ -15,11 +15,9 @@ export default {
   extensionsToTreatAsEsm: ['.ts'],
   verbose: true,
   transformIgnorePatterns,
-  // moduleNameMapper: {
-  //  '^@tests/(.*)$': '<rootDir>/tests/$1',
-  //  'lodash-es': 'lodash', // loadsh-es 如果报错可以这么处理
-  //  '^@/(.*)$': '<rootDir>/src/$1'
-  // },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
+  },
   testPathIgnorePatterns: ['/node_modules/'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { tsConfig: 'tsconfig.json', diagnostics: true, useESM: true }],
