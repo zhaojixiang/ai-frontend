@@ -5,7 +5,7 @@ const transformIgnorePatterns = [
   'node_modules/(?!.*@(babel|ant-design))(?!array-move)[^/]+?/(?!(es|node_modules)/)'
 ];
 
-export default {
+module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   // setupFiles: ['jest-useragent-mock'],
