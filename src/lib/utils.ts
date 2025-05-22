@@ -6,7 +6,7 @@
  * @returns {function}
  */
 export function debounce(fn: (...args: any[]) => void, fps = 60) {
-  let ST: NodeJS.Timeout | null = null;
+  let ST = null;
   return (...args: any[]) => {
     if (fps > 0) {
       clearTimeout(ST!);
@@ -49,7 +49,7 @@ export function throttle(fn: (...args: any[]) => void, fps = 60) {
 export function frequency(fn: (...args: any[]) => void, fps = 60) {
   let time = 0;
   let now = time;
-  let ST: NodeJS.Timeout | null = null;
+  let ST = null;
   const newFn = (...args: any[]) => {
     clearTimeout(ST!);
     now = Date.now();

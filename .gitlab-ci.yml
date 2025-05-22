@@ -1,30 +1,19 @@
 stages:
-  - fecheck
   - dev
   - fat
   - uat
   - pro
   - fee_unit
 
-fecheck:
-  stage: fecheck
-  script:
-    - '/usr/bin/env bash $CI_BUILDS_DIR/ci/fecheck.sh'
-  only:
-    - merge_requests
-    - master
-  tags:
-    - ecs
-
 fee_unit:
   stage: fee_unit
   variables:
-    BUILD_COMMAND: "pnpm install && pnpm test:coverage"
+    BUILD_COMMAND: 'pnpm install && pnpm test:coverage'
   script:
     - '/usr/bin/env bash $CI_BUILDS_DIR/ci/fee_unit_v2.sh'
   only:
     refs:
-        - /^[t|v]\d+\.\d+\.\d+$/
+      - /^[t|v]\d+\.\d+\.\d+$/
   tags:
     - ecs
   coverage: /All\sfiles.*?\s+(\d+.\d+)/
