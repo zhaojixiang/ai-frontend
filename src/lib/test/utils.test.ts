@@ -1,4 +1,4 @@
-import { debounce, throttle, frequency } from '../utils';
+import { debounce, frequency, throttle } from '../utils';
 
 describe('debounce', () => {
   jest.useFakeTimers(); // 使用 Jest 的假定时器

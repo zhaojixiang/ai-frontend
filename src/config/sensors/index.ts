@@ -1,4 +1,5 @@
 import sensors from '@woulsl-tools/sensors';
+
 export const initSensors = () => {
   let platform = '其他';
   const envName = import.meta.env.VITE_ENV_NAME;

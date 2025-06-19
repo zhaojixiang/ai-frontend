@@ -1,5 +1,5 @@
 import { Toast } from 'antd-mobile';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 
 import { serviceUrl } from '@/services/config';
 

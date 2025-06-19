@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 
-import { OS } from './lib/os/index';
-import { AxiosRequestConfig } from 'axios';
-import { ShowPageConfig } from './lib/showPage';
+import { type OS } from './lib/os/index';
+import { type AxiosRequestConfig } from 'axios';
+import { type ShowPageConfig } from './lib/showPage';
 
 declare global {
   interface Window {

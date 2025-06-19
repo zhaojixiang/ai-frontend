@@ -1,17 +1,17 @@
-import './index.less';
-import 'antd-mobile/es/global';
-
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
+import 'antd-mobile/es/global';
+
 import request from '@/lib/request';
 
+import * as utils from './lib/utils';
 import { initSensors } from './config/sensors';
 import { initSentry } from './config/sentry';
+import './index.less';
 import os from './lib/os';
 import { showPage } from './lib/showPage';
-import * as utils from './lib/utils';
 import router from './routes';
 
 // 注册全局变量 JOJO

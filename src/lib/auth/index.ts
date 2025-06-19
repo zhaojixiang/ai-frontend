@@ -1,6 +1,8 @@
-import { AUTH_SIGN_URL } from '@/services/config';
 import Cookies from 'js-cookie';
 import qs from 'query-string';
+
+import { AUTH_SIGN_URL } from '@/services/config';
+
 import type { AuthorizeType } from './index.d';
 
 /**

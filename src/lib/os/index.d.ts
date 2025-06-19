@@ -1,4 +1,4 @@
-export interface OS {
+export type OS = {
   /**
    * 是APP（包含：叫叫识字、叫叫绘本、叫叫口算、叫叫儿童阅读、jojoup）
    */

@@ -1,7 +1,6 @@
 import url from '@rollup/plugin-url';
 import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
-import viteESLint from '@xianzhengquan/vite-eslint-plugin';
 import istanbul from 'jojo-plugin-istanbul-vite';
 import path from 'path';
 import pxtovw from 'postcss-px-to-viewport';
@@ -27,17 +26,14 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     },
     assetsInclude: ['**/*.svga'],
     plugins: [
-      // eslint({
-      //   // 设置为 true 时，在终端中抛出 ESLint 错误
-      //   throwOnWarning: false,
-      //   throwOnError: true, // 控制是否抛出 ESLint 错误
-      //   include: ['src/**/*.ts', 'src/**/*.tsx'], // 自定义检查范围
-      //   exclude: ['node_modules', '.eslintrc.cjs']
-      // }),
-      {
-        ...viteESLint(),
-        apply: 'serve'
-      },
+      eslint({
+        fix: true,
+        lintOnStart: true, // 启动时检查（新增选项）
+        include: 'src/**/*.{js,jsx,ts,tsx}',
+        exclude: ['**/node_modules/**', '**/dist/**', '**/*.d.ts'],
+        emitWarning: true, // 开发模式推荐
+        emitError: command === 'build' // 构建时严格报错
+      }),
       react({
         // 按需加载
         babel: {
@@ -134,6 +130,8 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     }
   });
 
+  // console.log(111116, process.env);
+
   // 本地开发生效
   if (command === 'serve') {
     config = {
@@ -145,7 +143,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         fs: {
           strict: true
         },
-        open: true,
+        open: false,
         host: '0.0.0.0',
         // proxy: proxy(ENV_NAME),
         port: 3000

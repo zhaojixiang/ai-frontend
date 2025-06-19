@@ -1,9 +1,7 @@
-import './App.less';
-
 import { Outlet } from 'react-router-dom';
 
-const a = 1;
-console.log(a);
+import './App.less';
+
 function App() {
   return <Outlet />;
 }
