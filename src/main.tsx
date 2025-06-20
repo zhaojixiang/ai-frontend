@@ -2,8 +2,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
-import 'antd-mobile/es/global';
-
 import request from '@/lib/request';
 
 import * as utils from './lib/utils';

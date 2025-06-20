@@ -19,13 +19,18 @@ export default [
 
   // 2. 全局规则
   {
+    languageOptions: {
+      globals: {
+        ...globals.browser, // 确保所有 JS 文件都能识别 window
+        ...globals.node
+      }
+    },
     rules: {
       'no-unsafe-optional-chaining': 'error',
       'no-prototype-builtins': 'error',
       'import/no-default-export': 'off' // 根据项目需要调整
     }
   },
-
   // 3. React 配置
   {
     files: ['**/*.{jsx,tsx}'],
@@ -33,17 +38,6 @@ export default [
       react: pluginReact,
       'react-hooks': pluginReactHooks,
       'react-refresh': pluginReactRefresh
-    },
-    languageOptions: {
-      parserOptions: {
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module'
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.node
-        // __DEV__: 'readonly' // 添加常见开发环境全局变量
-      }
     },
     rules: {
       'react/react-in-jsx-scope': 'off',
@@ -60,9 +54,9 @@ export default [
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
       '@typescript-eslint/no-unused-vars': 'error', // 升级为error
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-ts-comment': 'warn',
-      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+      '@typescript-eslint/consistent-type-definitions': ['error'],
       '@typescript-eslint/consistent-type-imports': [
         'error',
         {

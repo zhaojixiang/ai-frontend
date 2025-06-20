@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
+import { type AxiosRequestConfig } from 'axios';
 
 import { type OS } from './lib/os/index';
-import { type AxiosRequestConfig } from 'axios';
 import { type ShowPageConfig } from './lib/showPage';
 
 declare global {
@@ -16,10 +16,7 @@ declare global {
   const JOJO: {
     os: OS;
     Utils: any;
-    request: <T = any>(
-      dataOrParams: object, // 第一个参数：接口所需的参数
-      config: AxiosRequestConfig = {} // 第二个参数：其他配置
-    ) => Promise<T>;
+    request: <T = any>(url: string, config?: AxiosRequestConfig) => Promise<T>;
     showPage: (url: string, { to, mode = 'navigate', params = {} }?: ShowPageConfig) => void;
   };
 }

@@ -60,8 +60,8 @@ export type OS = {
    * 是钉钉
    */
   dingding: boolean;
-}
+};
 
-const os: OS;
+const os: OS = {};
 
 export default os;

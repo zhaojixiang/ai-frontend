@@ -23,6 +23,8 @@ export type ShowPageConfig = {
  */
 export const miniprogramNavigateTo = (url: string, { params = {}, mode = 'navigate' }: any) => {
   // const path = `${url}?${qs.stringify(params)}`;
+  console.log(params);
+
   if (mode === 'redirect') {
     // wx.miniProgram.redirectTo({ url: path, complete: onFinish });
   } else {

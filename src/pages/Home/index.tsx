@@ -1,18 +1,39 @@
-import { Button } from 'antd-mobile';
+import { Button, Swiper, Toast } from 'antd-mobile';
 
-import S from './index.module.less';
+import styles from './index.module.less';
+
+const colors = ['#ace0ff', '#bcffbd', '#e4fabd', '#ffcfac'];
+
+const items = colors.map((color, index) => (
+  <Swiper.Item key={index}>
+    <div
+      className={styles.content}
+      style={{ background: color }}
+      onClick={() => {
+        Toast.show(`你点击了卡片 ${index + 1}`);
+      }}>
+      {index + 1}
+    </div>
+  </Swiper.Item>
+));
 
 export default function Home() {
-  // Toast.show('Hello World');
-  console.log(2222, import.meta.env.VITE_APP_NAME);
-
   return (
-    <div className={S.container}>
-      <h1 onClick={() => JOJO.showPage('https://mall.fat.tinman.cn/order/list', { to: 'flutter' })}>
-        Home
-      </h1>
-      <div>111</div>
-      <Button>Button</Button>
+    <div>
+      <Swiper
+        loop
+        autoplay
+        onIndexChange={(i) => {
+          console.log(i, 'onIndexChange1');
+        }}>
+        {items}
+      </Swiper>
+      <Button
+        onClick={() => {
+          Toast.show('点击了按钮');
+        }}>
+        点击我
+      </Button>
     </div>
   );
 }

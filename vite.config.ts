@@ -34,22 +34,6 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         emitWarning: true, // 开发模式推荐
         emitError: command === 'build' // 构建时严格报错
       }),
-      react({
-        // 按需加载
-        babel: {
-          plugins: [
-            [
-              'import',
-              {
-                libraryName: 'antd-mobile',
-                libraryDirectory: 'es/components',
-                style: false
-              },
-              'antd-mobile'
-            ]
-          ]
-        }
-      }),
       legacy({
         targets: [
           'Android >= 39',
@@ -114,7 +98,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         ],
         output: {
           manualChunks: {
-            react: ['react', 'react-dom'],
+            react: ['react', 'react-dom', 'antd-mobile'],
             sentry: ['@woulsl/sentry-config']
           }
         }
