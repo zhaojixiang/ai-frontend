@@ -56,7 +56,7 @@ export default [
       '@typescript-eslint/no-unused-vars': 'error', // 升级为error
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-ts-comment': 'warn',
-      '@typescript-eslint/consistent-type-definitions': ['error'],
+      // '@typescript-eslint/consistent-type-definitions': ['error'],
       '@typescript-eslint/consistent-type-imports': [
         'error',
         {

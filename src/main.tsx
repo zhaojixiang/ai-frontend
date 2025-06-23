@@ -5,10 +5,12 @@ import { RouterProvider } from 'react-router-dom';
 import request from '@/lib/request';
 
 import * as utils from './lib/utils';
-import { initSensors } from './config/sensors';
-import { initSentry } from './config/sentry';
 import './index.less';
+import { initDebugger } from './lib/debugger';
+import './lib/i18n';
 import os from './lib/os';
+import { initSensors } from './lib/sensors';
+import { initSentry } from './lib/sentry';
 import { showPage } from './lib/showPage';
 import router from './routes';
 
@@ -22,10 +24,8 @@ initSentry();
 // 初始化神策
 initSensors();
 
-// 调试工具
-if (import.meta.env.MODE === 'development') {
-  import('eruda').then((eruda) => eruda.default.init());
-}
+// 初始化调试工具
+initDebugger();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

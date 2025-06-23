@@ -13,7 +13,6 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   // 本地调试
   const envDir = path.resolve(__dirname, 'envs');
   const env = loadEnv(mode, envDir);
-  console.log(22222, env);
 
   let config: UserConfig = {
     clearScreen: false,
@@ -107,14 +106,12 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   };
 
   // 注入外部变量
-  const whiteKeys = ['APP_NAME'];
+  const whiteKeys = ['ENV_NAME'];
   Object.keys(process.env).forEach((item) => {
     if (whiteKeys.includes(item)) {
       process.env[`VITE_${item}`] = process.env[item];
     }
   });
-
-  // console.log(111116, process.env);
 
   // 本地开发生效
   if (command === 'serve') {

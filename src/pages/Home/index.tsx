@@ -1,4 +1,5 @@
 import { Button, Swiper, Toast } from 'antd-mobile';
+import { t } from 'i18next';
 
 import styles from './index.module.less';
 
@@ -32,7 +33,7 @@ export default function Home() {
         onClick={() => {
           Toast.show('点击了按钮');
         }}>
-        点击我
+        {t('thisIsTheFrontPage', '这是首页') as string}
       </Button>
     </div>
   );

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite",
+    "start": "cross-env ENV_NAME=fat vite",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=4096 vite build",
     "build:fat": "cross-env NODE_OPTIONS=--max_old_space_size=4096 ENV_NAME=fat vite build",
     "build:uat": "cross-env NODE_OPTIONS=--max_old_space_size=4096 ENV_NAME=uat vite build",
@@ -21,17 +21,24 @@
     ]
   },
   "dependencies": {
+    "@jojo-design/fc": "^0.3.3",
     "@woulsl-tools/sensors": "^1.2.6",
     "@woulsl/sentry-config": "^0.7.3",
     "antd-mobile": "^5.39.0",
     "autoprefixer": "^10.4.21",
     "axios": "^1.9.0",
     "eruda": "^3.4.1",
+    "i18next": "21.6.14",
+    "i18next-browser-languagedetector": "6.1.4",
+    "i18next-chained-backend": "^4.6.2",
+    "i18next-http-backend": "^3.0.2",
+    "i18next-resources-to-backend": "^1.2.1",
     "jojo-plugin-istanbul-vite": "^1.1.5",
     "js-cookie": "^3.0.5",
     "query-string": "^9.1.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^15.5.3",
     "react-router-dom": "^7.5.1"
   },
   "devDependencies": {

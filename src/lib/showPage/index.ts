@@ -8,14 +8,14 @@ import qs from 'query-string';
 
 import router from '@/routes';
 
-export type ShowPageConfig = {
+export interface ShowPageConfig {
   // 跳转目标环境：mini（小程序）、externalWeb（外部H5）、flutter（Flutter页面）、native（原生页面）
   to?: 'mini' | 'externalWeb' | 'flutter' | 'native' | '';
   // 跳转方式：navigate（跳转）、redirect（重定向），to === flutter | native 时，mode 无效
   mode?: 'navigate' | 'redirect';
   // 跳转参数：以键值对形式传递的参数
   params?: Record<string, any>;
-};
+}
 
 /**
  * 小程序内webview跳转到小程序

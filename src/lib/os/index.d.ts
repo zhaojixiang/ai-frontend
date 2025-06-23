@@ -1,4 +1,4 @@
-export type OS = {
+export interface OS {
   /**
    * 是APP（包含：叫叫识字、叫叫绘本、叫叫口算、叫叫儿童阅读、jojoup）
    */
@@ -60,7 +60,7 @@ export type OS = {
    * 是钉钉
    */
   dingding: boolean;
-};
+}
 
 const os: OS = {};
 
