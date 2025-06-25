@@ -1,6 +1,5 @@
 import url from '@rollup/plugin-url';
 import legacy from '@vitejs/plugin-legacy';
-import react from '@vitejs/plugin-react';
 import istanbul from 'jojo-plugin-istanbul-vite';
 import path from 'path';
 import pxtovw from 'postcss-px-to-viewport';
@@ -8,12 +7,21 @@ import type { ConfigEnv, UserConfig } from 'vite';
 import { defineConfig, loadEnv } from 'vite';
 import eslint from 'vite-plugin-eslint';
 
+/**
+ * 开发环境 环境变量取envs中的配置
+ * @param mode
+ * @returns
+ */
+const developmentEnvs = (mode: ConfigEnv['mode']) => {
+  const envDir = path.resolve(__dirname, 'envs');
+  loadEnv(mode, envDir);
+  return {
+    envDir
+  };
+};
+
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
-  // 本地调试
-  const envDir = path.resolve(__dirname, 'envs');
-  const env = loadEnv(mode, envDir);
-
   let config: UserConfig = {
     clearScreen: false,
     optimizeDeps: {
@@ -83,7 +91,9 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
 
     build: {
       sourcemap:
-        env.VITE_ENV_NAME === 'fat' || env.VITE_ENV_NAME === 'dev' || env.VITE_ENV_NAME === 'uat',
+        process?.env?.VITE_ENV_NAME === 'fat' ||
+        process?.env?.VITE_ENV_NAME === 'dev' ||
+        process?.env?.VITE_ENV_NAME === 'uat',
       target: 'es2015',
       minify: 'terser',
       chunkSizeWarningLimit: 500,
@@ -115,8 +125,11 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
 
   // 本地开发生效
   if (command === 'serve') {
+    // 获取本地环境变量
+    const { envDir } = developmentEnvs(mode);
     config = {
       ...config,
+      envDir,
       esbuild: {
         target: 'esnext'
       },
@@ -134,17 +147,12 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
 
   // 构建之后生效
   if (command === 'build') {
-    const CDN_DOMAIN = process.env.VITE_CDN_DOMAIN;
-    const CDN_PREFIX = process.env.VITE_CDN_PREFIX;
-
     config = {
       ...config,
-      // TODO：需与运维确认cdn地址及路由，并在wuxia进行配置
-      base: CDN_DOMAIN && CDN_PREFIX ? `${CDN_DOMAIN}${CDN_PREFIX}` : '/',
+      base: process.env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
       define: {
         'process.env.NODE_ENV': '"production"'
-      },
-      envDir
+      }
     };
   }
 

@@ -5,7 +5,7 @@ import { getDetail } from '@/services/api';
 export default function About() {
   useEffect(() => {
     getDetail({ linkCode: 'PLvMVsMwIys' }).then((res) => {
-      console.log(111111222, res);
+      console.log(111111222, window?.process?.env);
     });
   }, []);
 
@@ -13,7 +13,9 @@ export default function About() {
 
   return (
     <div>
-      <div onClick={handleClick}>About</div>
+      <div onClick={handleClick}>
+        <div>window: {window?.process?.env?.ENV_NAME}</div>
+      </div>
     </div>
   );
 }

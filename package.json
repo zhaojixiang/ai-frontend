@@ -4,10 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "cross-env ENV_NAME=fat vite",
-    "build": "cross-env NODE_OPTIONS=--max_old_space_size=4096 vite build",
-    "build:fat": "cross-env NODE_OPTIONS=--max_old_space_size=4096 ENV_NAME=fat vite build",
-    "build:uat": "cross-env NODE_OPTIONS=--max_old_space_size=4096 ENV_NAME=uat vite build",
+    "start": "vite",
+    "build": "vite build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "preview": "vite preview",
