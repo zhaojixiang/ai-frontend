@@ -41,7 +41,7 @@ i18n
            * 为了与目前 umi 更好兼容，可就以 umi 的国际化语言包格式
            * 那么，路径即：`@/locales/${language}.ts`
            */
-          import(`../../locales/${language}/index.ts`)
+          import(`../locales/${language}/index.ts`)
             .then((resources) => {
               console.log(111115, resources.default);
               callback(null, resources.default);

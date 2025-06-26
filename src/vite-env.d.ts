@@ -16,7 +16,7 @@ declare global {
   const JOJO: {
     os: OS;
     Utils: any;
-    request: <T = any>(url: string, config?: AxiosRequestConfig) => Promise<T>;
+    request: <T = any>(params: any, config?: AxiosRequestConfig) => Promise<T>;
     showPage: (url: string, { to, mode = 'navigate', params = {} }?: ShowPageConfig) => void;
   };
 }
