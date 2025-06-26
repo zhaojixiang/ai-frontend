@@ -116,7 +116,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   };
 
   // 注入外部变量
-  const whiteKeys = ['ENV_NAME'];
+  const whiteKeys = ['ENV_NAME', 'ENV_BASE'];
   Object.keys(process.env).forEach((item) => {
     if (whiteKeys.includes(item)) {
       process.env[`VITE_${item}`] = process.env[item];
@@ -140,7 +140,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         open: false,
         host: '0.0.0.0',
         // proxy: proxy(ENV_NAME),
-        port: 3000
+        port: 3001
       }
     };
   }
