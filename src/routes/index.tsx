@@ -3,7 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import App from '../App';
 import Home from '../pages/Home';
 
-console.log('VITE_ENV_BASE', import.meta.env.VITE_ENV_BASE);
+console.log('import.meta.env：', import.meta.env);
 
 const router = createBrowserRouter(
   [
