@@ -115,6 +115,9 @@ devDependencies:
   cross-env:
     specifier: ^7.0.3
     version: 7.0.3
+  dotenv:
+    specifier: ^16.6.0
+    version: 16.6.0
   eslint:
     specifier: ^9.27.0
     version: 9.27.0
@@ -4867,6 +4870,11 @@ packages:
     dependencies:
       is-obj: 2.0.0
     dev: false
+
+  /dotenv@16.6.0:
+    resolution: {integrity: sha512-Omf1L8paOy2VJhILjyhrhqwLIdstqm1BvcDPKg4NGAlkwEu9ODyrFbvk8UymUOMCT+HXo31jg1lArIrVAAhuGA==}
+    engines: {node: '>=12'}
+    dev: true
 
   /dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}

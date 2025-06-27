@@ -1,5 +1,6 @@
 import url from '@rollup/plugin-url';
 import legacy from '@vitejs/plugin-legacy';
+import dotenv from 'dotenv';
 import fs from 'fs';
 import istanbul from 'jojo-plugin-istanbul-vite';
 import path from 'path';
@@ -23,8 +24,21 @@ const developmentEnvs = (mode: ConfigEnv['mode']) => {
 
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
-  // 加载项目根目录下的所有环境变量
-  const env = loadEnv(mode, process.cwd(), '');
+  // 生产环境 环境变量配置
+  let env: any;
+  if (command === 'build') {
+    // 由于生产环境的环境变量配置文件是.envfile，所以需要手动引入
+    dotenv.config({ path: path.resolve(process.cwd(), '.envfile') });
+    // 加载项目根目录下的所有环境变量
+    env = loadEnv(mode, process.cwd(), '');
+    Object.keys(env).forEach((item) => {
+      // 注入外部变量
+      const whiteKeys = ['ENV_NAME', 'ENV_BASE'];
+      if (whiteKeys.includes(item)) {
+        process.env[`VITE_${item}`] = env[item];
+      }
+    });
+  }
 
   let config: UserConfig = {
     clearScreen: false,
@@ -143,24 +157,14 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   // 打印工作目录下的第一级的所有文件和文件夹
   const files = fs.readdirSync(process.cwd());
   console.log(1111111, files);
-  if (files.includes('.env')) {
+  if (files.includes('.envfile')) {
     // 读取env文件
-    const env = fs.readFileSync(path.join(process.cwd(), '.env'), 'utf-8');
+    const env = fs.readFileSync(path.join(process.cwd(), '.envfile'), 'utf-8');
     console.log('22222222：', env);
   }
 
   // 构建之后生效
   if (command === 'build') {
-    console.log('9888888：', env, process.env);
-
-    // 注入外部变量
-    const whiteKeys = ['ENV_NAME', 'ENV_BASE'];
-    Object.keys(env).forEach((item) => {
-      if (whiteKeys.includes(item)) {
-        process.env[`VITE_${item}`] = env[item];
-      }
-    });
-    console.log('99999：', process.env);
     config = {
       ...config,
       base: env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
