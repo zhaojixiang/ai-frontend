@@ -22,6 +22,9 @@ const developmentEnvs = (mode: ConfigEnv['mode']) => {
 
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
+  // 加载项目根目录下的所有环境变量
+  const env = loadEnv(mode, process.cwd(), '');
+
   let config: UserConfig = {
     clearScreen: false,
     optimizeDeps: {
@@ -91,9 +94,9 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
 
     build: {
       sourcemap:
-        process?.env?.VITE_ENV_NAME === 'fat' ||
-        process?.env?.VITE_ENV_NAME === 'dev' ||
-        process?.env?.VITE_ENV_NAME === 'uat',
+        env?.VITE_ENV_NAME === 'fat' ||
+        env?.VITE_ENV_NAME === 'dev' ||
+        env?.VITE_ENV_NAME === 'uat',
       target: 'es2015',
       minify: 'terser',
       chunkSizeWarningLimit: 500,
@@ -114,16 +117,6 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       }
     }
   };
-
-  // 注入外部变量
-  const whiteKeys = ['ENV_NAME', 'ENV_BASE'];
-  Object.keys(process.env).forEach((item) => {
-    if (whiteKeys.includes(item)) {
-      process.env[`VITE_${item}`] = process.env[item];
-    }
-  });
-
-  console.log('process.env：', process.env);
 
   // 本地开发生效
   if (command === 'serve') {
@@ -149,9 +142,16 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
 
   // 构建之后生效
   if (command === 'build') {
+    // 注入外部变量
+    const whiteKeys = ['ENV_NAME', 'ENV_BASE'];
+    Object.keys(env).forEach((item) => {
+      if (whiteKeys.includes(item)) {
+        env[`VITE_${item}`] = env[item];
+      }
+    });
     config = {
       ...config,
-      base: process.env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
+      base: env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
       define: {
         'process.env.NODE_ENV': '"production"'
       }
