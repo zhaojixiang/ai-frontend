@@ -158,6 +158,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
         process.env[`VITE_${item}`] = process.env[item];
       }
     });
+    console.log('33333333：', process.env);
     config = {
       ...config,
       // base: env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
