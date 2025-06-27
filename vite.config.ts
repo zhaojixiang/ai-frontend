@@ -1,5 +1,6 @@
 import url from '@rollup/plugin-url';
 import legacy from '@vitejs/plugin-legacy';
+import fs from 'fs';
 import istanbul from 'jojo-plugin-istanbul-vite';
 import path from 'path';
 import pxtovw from 'postcss-px-to-viewport';
@@ -139,18 +140,27 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       }
     };
   }
+  // 打印工作目录下的第一级的所有文件和文件夹
+  const files = fs.readdirSync(process.cwd());
+  console.log(1111111, files);
+  if (files.includes('.env')) {
+    // 读取env文件
+    const env = fs.readFileSync(path.join(process.cwd(), '.env'), 'utf-8');
+    console.log('22222222：', env);
+  }
 
   // 构建之后生效
   if (command === 'build') {
-    console.log('99999999999999：', env, process.env);
+    console.log('9888888：', env, process.env);
 
     // 注入外部变量
     const whiteKeys = ['ENV_NAME', 'ENV_BASE'];
     Object.keys(env).forEach((item) => {
       if (whiteKeys.includes(item)) {
-        env[`VITE_${item}`] = env[item];
+        process.env[`VITE_${item}`] = env[item];
       }
     });
+    console.log('99999：', process.env);
     config = {
       ...config,
       base: env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
