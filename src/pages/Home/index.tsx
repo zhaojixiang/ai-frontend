@@ -2,6 +2,8 @@ import { Button, Toast } from 'antd-mobile';
 import { t } from 'i18next';
 
 export default function Home() {
+  console.log('环境变量：', import.meta.env);
+
   return (
     <div>
       <Button
