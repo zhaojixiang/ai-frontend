@@ -1,6 +1,6 @@
 import url from '@rollup/plugin-url';
 import legacy from '@vitejs/plugin-legacy';
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 import fs from 'fs';
 import istanbul from 'jojo-plugin-istanbul-vite';
 import path from 'path';
@@ -24,23 +24,6 @@ const developmentEnvs = (mode: ConfigEnv['mode']) => {
 
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
-  // 生产环境 环境变量配置
-  let env: any;
-  if (command === 'build') {
-    // 由于生产环境的环境变量配置文件是.envfile，所以需要手动引入
-    dotenv.config({ path: path.resolve(process.cwd(), '.envfile') });
-    dotenv.config({ path: path.resolve(process.cwd(), '.devopsenv') });
-    // 加载项目根目录下的所有环境变量
-    env = loadEnv(mode, process.cwd(), '');
-    Object.keys(env).forEach((item) => {
-      // 注入外部变量
-      const whiteKeys = ['ENV_NAME', 'ENV_BASE'];
-      if (whiteKeys.includes(item)) {
-        process.env[`VITE_${item}`] = env[item];
-      }
-    });
-  }
-  console.log('9999999：', env);
   let config: UserConfig = {
     clearScreen: false,
     optimizeDeps: {
@@ -158,17 +141,27 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   // 打印工作目录下的第一级的所有文件和文件夹
   const files = fs.readdirSync(process.cwd());
   console.log(1111111, files);
-  if (files.includes('.devopsenv')) {
+  if (files.includes('.env')) {
     // 读取env文件
-    const env1 = fs.readFileSync(path.join(process.cwd(), '.devopsenv'), 'utf-8');
+    const env1 = fs.readFileSync(path.join(process.cwd(), '.env'), 'utf-8');
     console.log('22222222：', env1);
   }
 
+  const { CDN_DOMAIN = '', CDN_PREFIX = '' } = process.env || {};
+
   // 构建之后生效
   if (command === 'build') {
+    Object.keys(process.env).forEach((item) => {
+      // 注入外部变量
+      const whiteKeys = ['ENV_NAME', 'ENV_BASE'];
+      if (whiteKeys.includes(item)) {
+        process.env[`VITE_${item}`] = process.env[item];
+      }
+    });
     config = {
       ...config,
-      base: env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
+      // base: env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
+      base: CDN_DOMAIN + CDN_PREFIX,
       define: {
         'process.env.NODE_ENV': '"production"'
       }
