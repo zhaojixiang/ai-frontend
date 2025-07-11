@@ -21,6 +21,7 @@ export default function Coupon() {
   const [searchParams] = useSearchParams();
   const useType = searchParams.get('useType');
   const activityId = searchParams.get('activityId') || '';
+  console.log('activityId', activityId);
   const {
     data: pageDataRes,
     isLoading,

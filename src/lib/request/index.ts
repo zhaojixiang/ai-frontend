@@ -46,6 +46,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response: AxiosResponse) => {
     const { resultCode, errorMsg } = response.data;
+    console.log('response', resultCode, response);
 
     // 请求成功
     if (resultCode === 200) {

@@ -20,11 +20,13 @@ export const getClassIdsByLinkCode = (params: { linkCode: string }) =>
 /**
  * 获取优惠券活动
  */
-export const getCouponActivityDetail = (params: { activityId: string }) =>
-  JOJO.request(params, {
+export const getCouponActivityDetail = (params: { activityId: string }) => {
+  console.log('params', params);
+  return JOJO.request(params, {
     baseURL: serviceUrl.coupon,
     url: `/coupon-activities/${params.activityId}`
   });
+};
 
 /**
  * 领取优惠券，批量couponIds以英文逗号间隔
