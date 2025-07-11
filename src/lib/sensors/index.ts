@@ -4,19 +4,19 @@ export const initSensors = () => {
   let platform = '其他';
   const envName = import.meta.env.VITE_ENV_NAME;
 
-  if (JOJO.os.xcx) {
+  if (JOJO.Os.xcx) {
     platform = '微信小程序';
-  } else if (JOJO.os.wechatGzh) {
+  } else if (JOJO.Os.wechatBrowser) {
     platform = '微信内';
-  } else if (JOJO.os.app) {
+  } else if (JOJO.Os.app) {
     platform = 'APP内';
   }
 
   let server_url = '';
   if (envName === 'pro') {
-    if (JOJO.os.jojoup) {
+    if (JOJO.Os.jojoup) {
       server_url = 'https://sensors.tinman.cn/sa?project=jojoup';
-    } else if (JOJO.os.matrix) {
+    } else if (JOJO.Os.matrix) {
       server_url = 'https://sensors.tinman.cn/sa?project=jojo_matrix';
     } else {
       server_url = 'https://sensors.tinman.cn/sa?project=production';

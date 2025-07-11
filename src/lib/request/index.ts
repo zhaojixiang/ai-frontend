@@ -4,15 +4,25 @@ import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse 
 import { serviceUrl } from '@/services/config';
 
 import { isLogin } from '../auth';
+import Os from '../os';
 import whiteApi from './whiteApi';
 
 const TIMEOUT = 10000;
 
+// 模拟调试header信息，跳过授权检测
+export const DEBUG_HEADER_INFO = Os.debug
+  ? {
+      'X-UAGW-userId': import.meta.env.VITE_ENV_NAME === 'fat' ? 200500167 : 70010268,
+      'X-UAGW-authMode': 1
+    }
+  : {};
+
 const instance: AxiosInstance = axios.create({
-  baseURL: serviceUrl, // 默认值 baseUrl
+  baseURL: serviceUrl.product, // 默认值 baseUrl
   timeout: TIMEOUT,
   method: 'get',
-  withCredentials: true
+  withCredentials: true,
+  headers: DEBUG_HEADER_INFO
 });
 
 // 请求拦截器
@@ -62,9 +72,8 @@ instance.interceptors.response.use(
       return response.data;
     }
 
-    Toast.show({ icon: 'fail', content: errorMsg || '请求出错' });
     Promise.reject(new Error(errorMsg || '请求失败'));
-    return {};
+    return response.data;
   },
   (error) => {
     Toast.show({ icon: 'fail', content: error.message || '网络错误' });

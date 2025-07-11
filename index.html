@@ -15,6 +15,17 @@
         }
       };
     </script> -->
-    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- 初始化JOJO全局变量 -->
+    <script src="/src/lib/jojo/initJOJO.js"></script>
+
+    <script type="module">
+      (async () => {
+        await window.initJOJO();
+        console.log('✅ JOJO 已初始化:', window.JOJO);
+
+        import('/src/main.tsx');
+      })();
+    </script>
   </body>
 </html>

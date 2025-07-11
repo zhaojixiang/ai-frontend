@@ -6,6 +6,7 @@
  */
 import qs from 'query-string';
 
+import Os from '@/lib/os';
 import router from '@/routes';
 
 export interface ShowPageConfig {
@@ -32,21 +33,18 @@ export const miniprogramNavigateTo = (url: string, { params = {}, mode = 'naviga
   }
 };
 
-export const showPage = (
-  url: string,
-  { to, mode = 'navigate', params = {} }: ShowPageConfig = {}
-) => {
+const showPage = (url: string, { to, mode = 'navigate', params = {} }: ShowPageConfig = {}) => {
   switch (to) {
     case 'mini':
       // 跳转小程序原生页
-      if (JOJO.os.xcx) {
+      if (Os.xcx) {
         miniprogramNavigateTo(url, { params, mode });
       } else {
         console.error('未检测到小程序环境');
       }
       break;
     case 'externalWeb':
-      // 跳转外部 H5 页面
+      // 跳转外部 H5 页面 (指的是非当前项目域名以外的H5页面)
       if (mode === 'navigate') {
         window.location.href = url;
       } else {
@@ -55,7 +53,7 @@ export const showPage = (
       break;
     case 'flutter':
       // 叫叫儿童阅读 app中跳转 flutter 页面，传入H5页面url即可，会自动映射到 flutter 页面
-      if (JOJO.os.jojoReadApp) {
+      if (Os.jojoReadApp) {
         const resUrl = `${url}?${qs.stringify(params)}`;
         window.location.href = `tinman-router://cn.tinman.jojoread/webview?url=${encodeURIComponent(
           resUrl
@@ -66,15 +64,19 @@ export const showPage = (
       break;
     case 'native':
       // app中跳转 原生页面，需传入完整的 app url 例：tinman-router://cn.tinman.jojoread/home/course
-      if (JOJO.os.app) {
+      if (Os.app) {
         window.location.href = url;
       } else {
         console.error('非叫叫 app 环境');
       }
       break;
     default:
+      console.log(111115, params, router);
+
       // 页面内路由跳转
-      router.navigate(url, { replace: mode === 'redirect' });
+      router.navigate(url, { replace: mode === 'redirect', state: params });
       break;
   }
 };
+
+export default showPage;

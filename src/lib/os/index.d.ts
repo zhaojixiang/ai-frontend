@@ -1,5 +1,9 @@
 export interface OS {
   /**
+   * 本地调试
+   */
+  debug: boolean;
+  /**
    * 是APP（包含：叫叫识字、叫叫绘本、叫叫口算、叫叫儿童阅读、jojoup）
    */
   app: boolean;
@@ -51,7 +55,7 @@ export interface OS {
   /**
    * 是微信浏览器
    */
-  wechatGzh: boolean;
+  wechatBrowser: boolean;
   /**
    * 是支付宝
    */
@@ -62,6 +66,6 @@ export interface OS {
   dingding: boolean;
 }
 
-const os: OS = {};
+const Os: OS = {};
 
-export default os;
+export default Os;

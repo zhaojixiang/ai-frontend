@@ -1,7 +1,13 @@
 const { userAgent } = window.navigator;
 const app = /JoJo(Version|WebViewVersion)/i.test(window.navigator.userAgent);
 
-const os = {
+const Os = {
+  /**
+   * 本地调试
+   */
+  get debug() {
+    return import.meta.env.DEV;
+  },
   // 是APP（包含：叫叫识字、叫叫绘本、叫叫口算、叫叫儿童阅读、jojoup）
   get app() {
     return app;
@@ -34,7 +40,7 @@ const os = {
    * 当前 H5环境 是叫叫
    */
   get jojo() {
-    return import.meta.env.VITE_APP_NAME === '';
+    return !import.meta.env.VITE_APP_NAME;
   },
   /**
    * 当前 H5环境 是jojoup
@@ -57,7 +63,7 @@ const os = {
     return !!/MicroMessenger/i.test(userAgent);
   },
   // 是微信浏览器
-  get wechatGzh() {
+  get wechatBrowser() {
     return !!/MicroMessenger/i.test(userAgent) && !/miniprogram/gim.test(userAgent);
   },
   // 是支付宝
@@ -70,4 +76,4 @@ const os = {
   }
 };
 
-export default os;
+export default Os;

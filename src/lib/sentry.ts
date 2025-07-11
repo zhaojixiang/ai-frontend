@@ -2,7 +2,7 @@ import SentryConfig from '@woulsl/sentry-config';
 
 const envName = import.meta.env.VITE_ENV_NAME;
 const getSentryDNS = () => {
-  if (JOJO.os.matrix) {
+  if (JOJO.Os.matrix) {
     // 矩阵不需要上报sentry
     return '';
   } else {
