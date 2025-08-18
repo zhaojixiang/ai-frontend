@@ -35,6 +35,7 @@ export default function ReNew() {
           onClick: handleBtn,
           className: S.confirmBtn
         }
-      ]}></Modal>
+      ]}
+    />
   );
 }

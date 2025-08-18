@@ -30,6 +30,7 @@ export default [
       'react/no-unknown-property': 'off',
       'react/no-danger': 'off',
       'react/sort-comp': 'off',
+      'react/self-closing-comp': 'error',
       'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }]
     }
   },
