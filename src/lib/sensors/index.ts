@@ -1,6 +1,9 @@
 import sensors from '@woulsl-tools/sensors';
 
 export const initSensors = () => {
+  if (JOJO.Os.debug) {
+    return;
+  }
   let platform = '其他';
   const envName = import.meta.env.VITE_ENV_NAME;
 

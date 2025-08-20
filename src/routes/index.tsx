@@ -1,58 +1,19 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 
-import App from '../App';
-import Coupon from '../pages/coupon/Coupon';
-import Rules from '../pages/coupon/Rules';
-import DeliveryDetail from '../pages/delivery/Detail';
-import Home from '../pages/Home';
+import { routes } from './config';
+import { withSuspense } from './withSuspense';
 
-const router = createBrowserRouter(
-  [
-    {
-      path: '/',
-      element: <App />,
-      children: [
-        {
-          index: true,
-          element: <Navigate to='/coupon' replace />
-        },
-        {
-          path: 'home',
-          element: <Home />
-        },
-        {
-          path: 'coupon',
-          children: [
-            {
-              index: true,
-              element: <Navigate to='index' replace />
-            },
-            {
-              path: 'index',
-              element: <Coupon />
-            },
-            {
-              path: 'rules',
-              element: <Rules />
-            }
-          ]
-        },
-        {
-          path: 'delivery',
-          children: [
-            {
-              path: 'detail',
-              element: <DeliveryDetail />
-            }
-          ]
-        }
-        // 可以添加更多子路由
-      ]
-    }
-  ],
-  {
-    basename: import.meta.env.VITE_ENV_BASE
-  }
-);
+// 递归给所有 route.element 包裹 Suspense
+function wrapRoutes(routeList: any[]): any {
+  return routeList.map((route) => ({
+    ...route,
+    element: route.element ? withSuspense(route.element) : undefined,
+    children: route.children ? wrapRoutes(route.children) : undefined
+  }));
+}
+
+const router = createBrowserRouter(wrapRoutes(routes), {
+  basename: import.meta.env.VITE_ENV_BASE
+});
 
 export default router;

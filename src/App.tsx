@@ -1,14 +1,16 @@
 import './App.less';
+import './style/global.less';
 
 import { Outlet } from 'react-router-dom';
 
 import DebugTool from '@/lib/debugger/DebugTool';
+import { Os } from '@/lib/jojo';
 
 function App() {
   return (
     <>
       <Outlet />
-      {JOJO.Os.debug && <DebugTool />}
+      {Os.debug && <DebugTool />}
     </>
   );
 }

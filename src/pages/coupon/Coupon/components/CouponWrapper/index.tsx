@@ -66,7 +66,6 @@ const Index: React.FC<IProps> = (props) => {
   const onClickApply = async (coupon: any) => {
     await receiveCoupon({
       couponIds: [coupon.id],
-      activityId: coupon.activityId,
       channel: '',
       activityCode
     });

@@ -14,8 +14,6 @@ import CouponWrapper from './components/CouponWrapper';
 import RecommendGoods from './components/RecommendGoods';
 import S from './index.module.less';
 
-console.log(9999999, JOJO.Os);
-
 export default function Coupon() {
   const [isShowModal, setIsShowModal] = useState(false);
   const [searchParams] = useSearchParams();

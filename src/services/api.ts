@@ -32,12 +32,7 @@ export const getCouponActivityDetail = (params: { activityId: string }) => {
  * 领取优惠券，批量couponIds以英文逗号间隔
  * @param params
  */
-export const pickCoupon = (params: {
-  couponIds: any[];
-  activityId: string;
-  channel: string;
-  activityCode: string;
-}) =>
+export const pickCoupon = (params: { couponIds: any[]; channel: string; activityCode: string }) =>
   JOJO.request(params, {
     baseURL: serviceUrl.coupon,
     url: `/user/coupons`,

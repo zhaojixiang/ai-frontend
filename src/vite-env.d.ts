@@ -2,7 +2,7 @@
 import { type ToastShowProps } from 'antd-mobile';
 import { type AxiosRequestConfig } from 'axios';
 
-import { type OS } from './lib/os/index';
+import { type OS } from './lib/os/index.d';
 import { type ShowPageConfig } from './lib/showPage';
 
 declare global {
@@ -23,6 +23,7 @@ declare global {
     request: <T = any>(params: any, config?: AxiosRequestConfig) => Promise<T>;
     showPage: (url: string, { to, mode = 'navigate', params = {} }?: ShowPageConfig) => void;
     toast: ToastType;
+    bridge: any;
   }
   /**
    * jojo

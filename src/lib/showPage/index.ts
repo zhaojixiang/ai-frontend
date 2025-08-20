@@ -12,8 +12,8 @@ import router from '@/routes';
 export interface ShowPageConfig {
   // 跳转目标环境：mini（小程序）、externalWeb（外部H5）、flutter（Flutter页面）、native（原生页面）
   to?: 'mini' | 'externalWeb' | 'flutter' | 'native' | '';
-  // 跳转方式：navigate（跳转）、redirect（重定向），to === flutter | native 时，mode 无效
-  mode?: 'navigate' | 'redirect';
+  // 跳转方式：navigate（跳转）、replace（替换），to === flutter | native 时，mode 无效
+  mode?: 'navigate' | 'replace';
   // 跳转参数：以键值对形式传递的参数
   params?: Record<string, any>;
 }
@@ -26,7 +26,7 @@ export const miniprogramNavigateTo = (url: string, { params = {}, mode = 'naviga
   // const path = `${url}?${qs.stringify(params)}`;
   console.log(params);
 
-  if (mode === 'redirect') {
+  if (mode === 'replace') {
     // wx.miniProgram.redirectTo({ url: path, complete: onFinish });
   } else {
     // wx.miniProgram.navigateTo({ url: path, complete: onFinish });
@@ -52,7 +52,7 @@ const showPage = (url: string, { to, mode = 'navigate', params = {} }: ShowPageC
       }
       break;
     case 'flutter':
-      // 叫叫儿童阅读 app中跳转 flutter 页面，传入H5页面url即可，会自动映射到 flutter 页面
+      // 叫叫儿童阅读 app中跳转 flutter 页面，传入H5页面完整url即可，会自动映射到 flutter 页面
       if (Os.jojoReadApp) {
         const resUrl = `${url}?${qs.stringify(params)}`;
         window.location.href = `tinman-router://cn.tinman.jojoread/webview?url=${encodeURIComponent(
@@ -71,10 +71,8 @@ const showPage = (url: string, { to, mode = 'navigate', params = {} }: ShowPageC
       }
       break;
     default:
-      console.log(111115, params, router);
-
       // 页面内路由跳转
-      router.navigate(url, { replace: mode === 'redirect', state: params });
+      router.navigate(url, { replace: mode === 'replace', state: params });
       break;
   }
 };

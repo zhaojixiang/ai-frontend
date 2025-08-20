@@ -1,10 +1,12 @@
+import jojoAccount from '@jojo/account-sdk';
 import Cookies from 'js-cookie';
 import qs from 'query-string';
 
 import { getClassIdsByLinkCode } from '@/services/api';
-import { AUTH_SIGN_URL } from '@/services/config';
+import { AUTH_SIGN_URL, UC_API_URL_BASE } from '@/services/config';
 
-import type { AuthorizeType } from './index.d';
+import { isIosApp } from '../utils';
+import type { AuthorizeType, WxAuthOptions } from './index.d';
 
 const IS_NEW_ACCOUNT_AUTH = 'dubbleAccountLogin';
 
@@ -19,7 +21,7 @@ export async function toAuthrize({
   wechatAuthType,
   authBizType,
   requestUrl
-}: AuthorizeType) {
+}: AuthorizeType): Promise<string> {
   const url = requestUrl || window.location.href;
   const classIds = await _getClassIdsByLinkCode();
 
@@ -51,8 +53,8 @@ export function isDoubleAccountLogin() {
   const authToken = isLogin();
   // 双账号登录标识
   const isNewAccountAuth = Cookies.get(IS_NEW_ACCOUNT_AUTH);
-  // 在微信浏览器环境内，已登录非新授权，唤起新授权
-  if (JOJO.Os.wechatBrowser && authToken && isNewAccountAuth === 'yes') {
+  // 在微信浏览器环境内，已登录新授权
+  if ((JOJO.Os.wechatBrowser && authToken && isNewAccountAuth === 'yes') || JOJO.Os.debug) {
     return true;
   }
   return false;
@@ -102,4 +104,202 @@ export const _getClassIdsByLinkCode = async () => {
     }
   }
   return classIdStr;
+};
+
+/**
+ * 微信授权: 用于仅授权不登录
+ */
+export const wxAuth = async (props?: WxAuthOptions) => {
+  // 非微信浏览器环境，不进行微信授权
+  if (!JOJO.Os.wechatBrowser || JOJO.Os.debug) {
+    return true;
+  }
+  const { needPopLogin = false } = props || {};
+
+  // 已授权，不进行微信授权
+  const wxAuthCode = Cookies.get('uc_dubbleAccount_wxAuthCode');
+  if (wxAuthCode) {
+    return true;
+  }
+
+  // 仅授权时，已有登录态，不进行微信授权
+  if (!needPopLogin) {
+    const _isDoubleAccountLogin = isDoubleAccountLogin();
+    if (_isDoubleAccountLogin) {
+      return true;
+    }
+  }
+
+  // 未授权，进行微信授权
+  let url = window.location.href;
+  if (needPopLogin) {
+    const [baseUrl, queryString] = url.split('?');
+    const existingParams = qs.parse(queryString);
+    const mergedParams = { ...existingParams, needPopLogin: true };
+    const newQueryString = qs.stringify(mergedParams);
+    url = `${baseUrl}?${newQueryString}`;
+  }
+  const authUrl = await toAuthrize({
+    mode: 1,
+    authBizType: 4,
+    requestUrl: url
+  });
+  window.location.replace(authUrl);
+  return false;
+};
+
+/**
+ * 添加链接上的 needPopLogin 参数
+ */
+const addNeedPopLoginInUrl = () => {
+  const existingParams = qs.parse(window.location.search.replace(/^\?/, ''));
+  const newQuery = {
+    ...existingParams,
+    needPopLogin: true
+  };
+  const curUrl = `${window.location.pathname?.replace('/mall/center', '')}?${qs.stringify(
+    newQuery
+  )}`;
+  JOJO.showPage(curUrl, { mode: 'replace' });
+};
+
+/**
+ * 清除链接上的 needPopLogin 参数
+ */
+const clearNeedPopLoginInUrl = () => {
+  const existingParams = qs.parse(window.location.search.replace(/^\?/, ''));
+  const { needPopLogin, ...rest } = existingParams || {};
+  const url = `${window.location.pathname?.replace('/mall/center', '')}?${qs.stringify(rest)}`;
+  JOJO.showPage(url, { mode: 'replace' });
+};
+
+interface PopLoginOptions {
+  callback?: () => void;
+}
+/**
+ * 弹窗登录
+ */
+export const popLogin = (props?: PopLoginOptions) => {
+  if (JOJO.Os.app || JOJO.Os.xcx) {
+    return;
+  }
+
+  if (JOJO.Os.wechatBrowser) {
+    // 先微信授权
+    const isWxAuth = wxAuth({ needPopLogin: true });
+    if (!isWxAuth) {
+      return;
+    }
+  }
+
+  const { callback } = props || {};
+
+  // 弹出弹窗，清除链接上的标识，避免刷新页面再次弹出
+  clearNeedPopLoginInUrl();
+
+  jojoAccount.popupLogin({
+    wechatLogin: {
+      mode: 1,
+      wechatAuthType: 1,
+      requestUrl: window.location.href
+    },
+    platformName: JOJO.Os.jojoup ? 'mall-jojoup-order' : 'mall-jojo-order',
+    showWechatBtn: 'hidden',
+    ...(JOJO.Os.wechatBrowser ? { dubbleAccountLoginVersion: 'V2' } : {}),
+    dubbleAccountLoginClassIds: localStorage.getItem('classIdStr') || '',
+    dubbleAccountLogin: true,
+    callback: () => {
+      callback?.();
+    },
+    onError: (res) => {
+      // 微信授权code失效，重新授权
+      if (String(res?.subCode) === '3033') {
+        wxAuth({ needPopLogin: true });
+      }
+    }
+  });
+};
+
+enum AccountState {
+  NOT_APPLY = 'NOT_APPLY', // 未申请注销
+  WAIT_CANCELLATION = 'WAIT_CANCELLATION', // 等待注销
+  CANCELLATION = 'CANCELLATION', // 已注销
+  CANCELED = 'CANCELED' // 已取消
+}
+/*
+ * 校验用户是否申请注销
+ */
+export async function popupLogout(props: any = {}) {
+  let isShowLogout = false;
+  try {
+    const res = await jojoAccount.popupLogout({
+      confirmCallback: () => {
+        JOJO.toast.show({
+          content: '撤销成功',
+          icon: 'success'
+        });
+      },
+      ...props
+    });
+    const { status, data } = res || {};
+    if (status === 0) {
+      const { accountState } = data || {};
+      if (accountState === AccountState.WAIT_CANCELLATION) {
+        isShowLogout = true;
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  return isShowLogout;
+}
+// 直接登录
+let loginTimer: any = null;
+// 游客模式下，需要调用另外的登录原生页面
+export const jojoAppDirectLoginNoGuest = async (url = '') => {
+  try {
+    if (JOJO.Os.jojoReadApp && JOJO.Os.jojoup) {
+      await jojoAccount.logout();
+      // 叫叫app中使用jojoup链接时
+      const redirectUrl: string = await toAuthrize({
+        mode: 1,
+        authBizType: 3
+      });
+      window.location.replace(redirectUrl);
+    } else {
+      clearTimeout(loginTimer);
+      loginTimer = setTimeout(async () => {
+        const { status, data } = await JOJO.bridge.call('nativeOnlyLogin');
+        if (status === 200 && data && data.authToken) {
+          window.location.href = `${UC_API_URL_BASE}/page/appWeb/portal/appWebLogin?authToken=${
+            data.authToken
+          }&packageName=mp.tinman.JoJoRead&targetUrl=${encodeURIComponent(
+            url || window.location.href
+          )}`;
+        }
+      }, 300);
+    }
+  } catch (e) {
+    console.error('ERROR===', e);
+  }
+};
+
+export const isAuditGuestLogin = async () => {
+  let audit = false;
+  let guest = false;
+  const _isIosApp = await isIosApp();
+
+  if (_isIosApp && JOJO.Os.jojoReadApp) {
+    const deviceInfo = await JOJO.bridge.call('getDeviceInfo');
+    if (deviceInfo?.status === 200 && deviceInfo?.data) {
+      audit = deviceInfo?.data?.iosAudit === '1';
+      guest = deviceInfo?.data?.iosAuditVisitor === '1';
+    }
+  }
+  if (audit && guest) {
+    jojoAppDirectLoginNoGuest();
+    return true;
+  } else {
+    return false;
+  }
 };

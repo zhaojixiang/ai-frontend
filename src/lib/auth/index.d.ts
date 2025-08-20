@@ -6,3 +6,7 @@ export interface AuthorizeType {
   linkCode?: string; // 用于查询班期id
   requestUrl?: string; // 用于查询班期id
 }
+
+export interface WxAuthOptions {
+  needPopLogin?: boolean; // 是否需要弹出登录，该参数仅用于给链接上添加needPopLogin参数，后续弹窗登录逻辑需单独处理
+}

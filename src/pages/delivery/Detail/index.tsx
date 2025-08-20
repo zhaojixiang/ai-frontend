@@ -4,7 +4,7 @@ import { Toast } from 'antd-mobile';
 import { LeftOutline } from 'antd-mobile-icons';
 // import { Icon, Toast } from '@jojo-design/mobile';
 import dayjs from 'dayjs';
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash-es';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSearchParams } from 'react-router-dom';
@@ -48,7 +48,6 @@ export default function Detail() {
     queryKey: ['getDeliveryDetail'],
     queryFn: () => getDeliveryTrace({ gpoNo, expressNo })
   });
-  console.log(111115, gpoNo, expressNo, pageDataRes);
 
   useEffect(() => {
     console.log('pageDataRes', pageDataRes);

@@ -3,6 +3,16 @@ export interface OS {
    * 本地调试
    */
   debug: boolean;
+
+  /**
+   * 环境名称
+   */
+  envName: string;
+
+  /**
+   * APP名称
+   */
+  appName: string;
   /**
    * 是APP（包含：叫叫识字、叫叫绘本、叫叫口算、叫叫儿童阅读、jojoup）
    */
@@ -19,6 +29,10 @@ export interface OS {
    * 是叫叫儿童阅读APP 鸿蒙版
    */
   jojoReadHmApp: boolean;
+  /**
+   * 是矩阵APP
+   */
+  matrixApp: boolean;
   /**
    * 是识字APP
    */
@@ -65,7 +79,3 @@ export interface OS {
    */
   dingding: boolean;
 }
-
-const Os: OS = {};
-
-export default Os;

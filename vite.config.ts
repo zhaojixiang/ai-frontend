@@ -1,4 +1,3 @@
-import url from '@rollup/plugin-url';
 import legacy from '@vitejs/plugin-legacy';
 // import dotenv from 'dotenv';
 import istanbul from 'jojo-plugin-istanbul-vite';
@@ -88,14 +87,15 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
       assetsInlineLimit: 0,
       rollupOptions: {
         context: 'window',
-        plugins: [
-          url({
-            include: ['**/*.svga']
-          })
-        ],
+        // plugins: [
+        //   url({
+        //     include: ['**/*.svga']
+        //   })
+        // ],
         output: {
           manualChunks: {
-            react: ['react', 'react-dom', 'antd-mobile'],
+            react: ['react', 'react-dom'],
+            antdMobile: ['antd-mobile'],
             sentry: ['@woulsl/sentry-config']
           }
         }

@@ -1,12 +1,33 @@
+import { type OS } from './index.d';
+
 const { userAgent } = window.navigator;
 const app = /JoJo(Version|WebViewVersion)/i.test(window.navigator.userAgent);
 
-const Os = {
+const Os: OS = {
   /**
    * 本地调试
    */
   get debug() {
     return import.meta.env.DEV;
+  },
+  /**
+   * 环境名称
+   */
+  get envName() {
+    return import.meta.env.VITE_ENV_NAME;
+  },
+  // APP名称
+  get appName() {
+    if (this.jojo) {
+      return 'jojo';
+    }
+    if (this.jojoup) {
+      return 'jojoup';
+    }
+    if (this.matrix) {
+      return 'matrix';
+    }
+    return '';
   },
   // 是APP（包含：叫叫识字、叫叫绘本、叫叫口算、叫叫儿童阅读、jojoup）
   get app() {
@@ -24,6 +45,12 @@ const Os = {
   get jojoReadHmApp() {
     return app && !!/JoJoAppFrom\/read\/hm/i.test(userAgent);
   },
+  /**
+   * 当前 H5环境 是矩阵
+   */
+  get matrixApp() {
+    return app && !this.jojoupApp && !this.jojoReadApp;
+  },
   // 是识字APP
   get shiziAPP() {
     return app && !!/JoJoSherlock/gim.test(userAgent);
@@ -40,7 +67,7 @@ const Os = {
    * 当前 H5环境 是叫叫
    */
   get jojo() {
-    return !import.meta.env.VITE_APP_NAME;
+    return import.meta.env.VITE_APP_NAME === 'jojo';
   },
   /**
    * 当前 H5环境 是jojoup

@@ -1,0 +1,55 @@
+.bottomZone {
+  z-index: 9;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+
+  .purchaseZone {
+    height: 66px;
+    width: 375px;
+    display: flex;
+    align-items: center;
+    .supportWrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-left: 20px;
+      .supportImg {
+        width: 24px;
+        height: 24px;
+        background: url('@/assets/image/support.png') no-repeat center/contain;
+      }
+      .supportDesc {
+        color: #738d9b;
+        font-weight: 400;
+        font-size: 11px;
+        line-height: 16px;
+      }
+    }
+    .btnWrapper {
+      width: 100%;
+      text-align: center;
+      .btn {
+        background-color: #fcda00;
+        color: #544300;
+        border-radius: 25px;
+        display: inline-block;
+        font-weight: 500;
+        font-size: 16px;
+        text-align: center;
+        width: 80%;
+        height: 44px;
+        line-height: 44px;
+        &.disabled {
+          background: #e9ecf0;
+        }
+      }
+      &.noSupport {
+        width: 100%;
+      }
+    }
+  }
+}
