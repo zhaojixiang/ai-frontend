@@ -2,12 +2,12 @@ import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 
 // 懒加载页面
-const App = lazy(() => import('../App'));
-const Home = lazy(() => import('../pages/Home'));
-const Detail = lazy(() => import('../pages/item/Detail'));
-const Coupon = lazy(() => import('../pages/coupon/Coupon'));
-const Rules = lazy(() => import('../pages/coupon/Rules'));
-const DeliveryDetail = lazy(() => import('../pages/delivery/Detail'));
+const App = lazy(() => import('@/App'));
+const Home = lazy(() => import('@/pages/Home'));
+const Detail = lazy(() => import('@/pages/item/Detail'));
+const Coupon = lazy(() => import('@/pages/coupon/Coupon'));
+const Rules = lazy(() => import('@/pages/coupon/Rules'));
+const DeliveryDetail = lazy(() => import('@/pages/delivery/Detail'));
 
 export const routes = [
   {
