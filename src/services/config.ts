@@ -60,6 +60,14 @@ export const JOIN_CLASS_URL = `${LANDING_BASE_URL}${
   Os.jojoup ? '/orderTransfer.html' : '/act2/17xlpt/orderTransfer.html'
 }`;
 
+// 教务地址
+const jojo_read_base_url: Record<string, string> = {
+  jojo: `https://jojoread${separatorEnv}.tinman.cn`,
+  jojoup: `https://pages${separatorEnv}.mohezi.cn/read`,
+  matrix: `https://jojoread${separatorEnv}.cdssylkj.com`
+};
+export const JOJO_READ_BASE_URL = jojo_read_base_url[Os.appName];
+
 // 智齿客服地址
 export const JING_TAN_NO_AUTH_URL = Os.jojoup
   ? `https://api.mohezi.cn/fb/pagani/api/pagani/view/jingtan/chat`
@@ -81,23 +89,20 @@ export const UC_API_URL_BASE = uc_api_url_base[Os.appName];
 export const ACT_ORDER_TRANSFER_URL = '';
 
 // --------------------服务端域名----------------------
-// 服务端域名前缀
-let serviceUrlPrefix: string;
-if (Os.jojo) {
-  serviceUrlPrefix = `https://api${separatorEnv}.tinman.cn/mall`;
-} else if (Os.jojoup) {
-  serviceUrlPrefix = `https://pages${separatorEnv}.mohezi.cn/mall/center`;
-} else {
-  serviceUrlPrefix = `https://api${separatorEnv}.cdssylkj.com/mall`;
-}
+// 商城服务端域名前缀
+export const SERVICE_URL_PREFIX = {
+  jojo: `https://api${separatorEnv}.tinman.cn`,
+  jojoup: `https://pages${separatorEnv}.mohezi.cn`,
+  matrix: `https://api${separatorEnv}.cdssylkj.com`
+}[Os.appName];
 /**
  * 服务端域名
  */
 export const serviceUrl = {
-  product: `${serviceUrlPrefix}/product/api/fe`,
-  coupon: `${serviceUrlPrefix}/coupon/api/coupon/fe`,
-  order: `${serviceUrlPrefix}/order/api/fe`,
-  orderpay: `${serviceUrlPrefix}/order-pay/`
+  product: `${SERVICE_URL_PREFIX}/mall/product/api/fe`,
+  coupon: `${SERVICE_URL_PREFIX}/mall/coupon/api/coupon/fe`,
+  order: `${SERVICE_URL_PREFIX}/mall/order/api/fe`,
+  orderpay: `${SERVICE_URL_PREFIX}/mall/order-pay/`
 };
 
 export const AUTH_SIGN_URL = `${UC_API_URL_BASE}/page/wechatMp/portal/entrance`;

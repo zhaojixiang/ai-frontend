@@ -1,6 +1,7 @@
 import './index.less';
 import './lib/i18n';
 
+import jojoAccount from '@jojo/account-sdk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -14,6 +15,7 @@ import { initDebugger } from './lib/debugger';
 import { initSensors } from './lib/sensors';
 import { initSentry } from './lib/sentry';
 import router from './routes';
+import { JOJO_READ_BASE_URL, SERVICE_URL_PREFIX, UC_API_URL_BASE } from './services/config';
 
 const queryClient = new QueryClient();
 // 注册全局变量 JOJO
@@ -29,6 +31,16 @@ initJOJO().then(() => {
 
   // 设置favicon
   setupFavicon();
+
+  // 初始化jojoAccount sdk
+  jojoAccount.config({
+    envName: window.process.env.ENV_NAME, // 测试环境
+    hosts: {
+      ucHost: UC_API_URL_BASE,
+      serverHost: JOJO_READ_BASE_URL,
+      apiHost: SERVICE_URL_PREFIX
+    }
+  });
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
