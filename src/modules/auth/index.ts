@@ -33,7 +33,7 @@ export async function toAuthrize({
     dubbleAccountLoginClassIds: classIds,
     requestUrl: encodeURIComponent(url)
   });
-
+  console.log(`${AUTH_SIGN_URL}?${queryParams}`);
   return `${AUTH_SIGN_URL}?${queryParams}`;
 }
 

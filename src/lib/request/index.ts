@@ -14,7 +14,7 @@ const userId = localStorage.getItem('userId');
 // 模拟调试header信息，跳过授权检测
 export const DEBUG_HEADER_INFO = Os.debug
   ? {
-      'X-UAGW-userId': userId,
+      'X-UAGW-userId': userId || '10025838',
       'X-UAGW-authMode': 1
     }
   : {};
@@ -70,6 +70,8 @@ instance.interceptors.response.use(
         mode: 1,
         authBizType: 3
       });
+      console.log('redirectUrl1', redirectUrl);
+
       window.location.replace(redirectUrl);
       return Promise.reject(new Error(errorMsg || '未登录'));
     }
@@ -82,6 +84,7 @@ instance.interceptors.response.use(
         mode: 3,
         wechatAuthType: 2
       });
+      console.log('redirectUrl2', redirectUrl);
 
       window.location.replace(redirectUrl);
       return Promise.reject(new Error(errorMsg || '需要获取openId'));

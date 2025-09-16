@@ -262,6 +262,8 @@ export default function Detail() {
    * 点击购买按钮
    */
   const handleBuyBtn = async () => {
+    console.log('handleBuyBtn');
+
     const { canBuy } = pageData || {};
     // 前置判断
     if (canBuy === 0) {
@@ -415,9 +417,13 @@ export default function Detail() {
    */
   const judgeLogin = () => {
     if (isRequestAuthApi()) {
+      console.log('已登录');
+
       // 已登录，继续后续流程
       return true;
     } else {
+      console.log('未登录');
+
       // 弹窗登录
       popLogin({
         callback: () => {
@@ -432,7 +438,11 @@ export default function Detail() {
    * 未登录点击拦截
    */
   const onNotLoginIntercept = (e: any) => {
+    console.log('onNotLoginIntercept');
+
     if (!judgeLogin()) {
+      console.log('未登录点击拦截');
+
       e.stopPropagation();
     }
   };
