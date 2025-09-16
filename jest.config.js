@@ -9,6 +9,7 @@ export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   // setupFiles: ['jest-useragent-mock'],
+  setupFiles: ['./test/setupGlobals.ts'],
   setupFilesAfterEnv: ['./test/setupAfterEnv.ts', './test/setupFilesMocks.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'md'],
   modulePathIgnorePatterns: ['<rootDir>/package.json'],

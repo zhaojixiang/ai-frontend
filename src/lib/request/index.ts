@@ -47,7 +47,9 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   async (response: AxiosResponse) => {
-    const { resultCode, errorMsg } = response.data;
+    console.log(11111111, response);
+
+    const { resultCode, errorMsg, status } = response.data;
 
     // 请求成功
     if (resultCode === 200) {
@@ -55,7 +57,7 @@ instance.interceptors.response.use(
     }
 
     // 未登录
-    if ([1001, 1005].includes(resultCode)) {
+    if ([1001, 1005].includes(status)) {
       Toast.show({ icon: 'fail', content: errorMsg || '未登录' });
       // 跨租户使用链接：在非jojoup app中使用jojo的链接
       const isCorssTenant = (Os.jojoReadApp && Os.jojoup) || (Os.jojoupApp && Os.jojo);
@@ -73,7 +75,7 @@ instance.interceptors.response.use(
     }
 
     // 需获取openId
-    if ([1002].includes(resultCode)) {
+    if ([1002].includes(status)) {
       Toast.show({ icon: 'fail', content: errorMsg || '需要获取openId' });
       const redirectUrl = await toAuthrize({
         appId: response.data?.authWechatAppId,
