@@ -154,7 +154,7 @@ export const wxAuth = async (props?: WxAuthOptions) => {
 const clearNeedPopLoginInUrl = () => {
   const existingParams = qs.parse(window.location.search.replace(/^\?/, ''));
   const { needPopLogin, ...rest } = existingParams || {};
-  const url = `${window.location.pathname?.replace('/mall/center', '')}?${qs.stringify(rest)}`;
+  const url = `${window.location.pathname?.replace(/\/(mall\/center|velocity)/g, '')}?${qs.stringify(rest)}`;
   JOJO.showPage(url, { mode: 'replace' });
 };
 
