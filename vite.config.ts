@@ -16,7 +16,6 @@ const htmlPlugin = () => {
     transformIndexHtml(html: string) {
       // 在根节点后面，替换 hmtl 上的window替换掉
       return html.replace(
-        // /<div id="root"><\/div>/,
         /<div id="root">\s*<span class="loading-spinner"><\/span>\s*<\/div>/,
         `<div id="root"><span class="loading-spinner"></span></div><script id="env">window.process = {env:${JSON.stringify(
           env
@@ -147,14 +146,11 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
     };
   }
 
-  // const { CDN_DOMAIN = '', CDN_PREFIX = '' } = process.env || {};
-
   // 构建之后生效
   if (command === 'build') {
     config = {
       ...config,
       base: process.env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
-      // base: CDN_DOMAIN + CDN_PREFIX,
       define: {
         'process.env.NODE_ENV': '"production"'
       }
