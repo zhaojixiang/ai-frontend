@@ -51,15 +51,17 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   async (response: AxiosResponse) => {
-    console.log(11111111, response);
-
     const { resultCode, errorMsg, status } = response.data;
 
     // 请求成功
     if (resultCode === 200) {
       return response.data;
     }
-
+    // 当接口有返回但是我们服务端处理失败时，我们需要根据配置来判断是否展示错误提示，默认展示，
+    // 可以在请求时配置 hideError: true 来隐藏错误提示
+    if (resultCode !== 200 && response.config?.hideError !== true) {
+      Toast.show({ icon: 'fail', content: errorMsg || '请求失败' });
+    }
     // 未登录
     if ([1001, 1005].includes(status)) {
       Toast.show({ icon: 'fail', content: errorMsg || '未登录' });
