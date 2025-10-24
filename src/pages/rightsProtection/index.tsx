@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import ClassIcon from '@/assets/images/jojo/rightsProtection/class.png';
 import GiftIcon from '@/assets/images/jojo/rightsProtection/gift.png';
@@ -41,8 +41,7 @@ interface SkuItem {
 }
 
 const RightsProtection = () => {
-  const [searchParams] = useSearchParams();
-  const orderId = searchParams.get('orderId');
+  const { orderId } = useParams();
 
   // 异常状态页面展示
   const [errorPageStatus, setErrorPageStatus] = useState({
