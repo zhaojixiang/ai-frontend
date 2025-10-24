@@ -13,6 +13,7 @@ import {
   getOrderRules
 } from '@/services/api/rightsProtection';
 
+import ChoiceGift from './components/choiceGift';
 import ErrorPage from './components/errorPage';
 import SuccessPage from './components/successPage';
 import styles from './index.module.less';
@@ -69,7 +70,9 @@ const RightsProtection = () => {
   // 订单保障规则
   const [promotionData, setPromotionData] = useState({
     giftPoolsType: '',
-    PromotionList: []
+    poolNum: 0,
+    normalList: [],
+    choicesList: []
   });
   // 订单相关信息
   const [productData, setProductData] = useState({
@@ -84,7 +87,11 @@ const RightsProtection = () => {
   const getCurrentPromotionList = (discounts: any) => {
     let giftPoolsType = 'NORMAL_GIFT';
     // 获取到命中规则的奖池List
-    const hitPromotionList = discounts.filter((item: any) => item.hitPromotion === true);
+    const hitPromotionList = discounts?.filter((item: any) => item.hitPromotion === true) ?? [];
+    const normalList =
+      hitPromotionList?.filter((item: any) => item.giftStrategy === 'NORMAL_GIFT') ?? [];
+    const choicesList =
+      hitPromotionList?.filter((item: any) => item.giftStrategy === 'CHOICES_GIFT') ?? [];
     if (hitPromotionList.length === 1) {
       giftPoolsType = hitPromotionList[0].giftStrategy;
     } else if (hitPromotionList.length > 1) {
@@ -117,7 +124,9 @@ const RightsProtection = () => {
 
     return {
       giftPoolsType,
-      PromotionList: hitPromotionList
+      normalList,
+      choicesList,
+      poolNum: hitPromotionList?.length
     };
   };
 
@@ -320,6 +329,7 @@ const RightsProtection = () => {
                   <div className={styles.line} />
                   <div className={styles.text}>可更换为</div>
                 </div>
+                <ChoiceGift {...promotionData} />
               </div>
             </div>
           </>
