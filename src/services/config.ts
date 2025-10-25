@@ -102,7 +102,8 @@ export const serviceUrl = {
   product: `${SERVICE_URL_PREFIX}/mall/product/api/fe`,
   coupon: `${SERVICE_URL_PREFIX}/mall/coupon/api/coupon/fe`,
   order: `${SERVICE_URL_PREFIX}/mall/order/api/fe`,
-  orderpay: `${SERVICE_URL_PREFIX}/mall/order-pay/`
+  orderpay: `${SERVICE_URL_PREFIX}/mall/order-pay/`,
+  cashback: `${SERVICE_URL_PREFIX}/mall/cashback`
 };
 
 export const AUTH_SIGN_URL = `${UC_API_URL_BASE}/page/wechatMp/portal/entrance`;

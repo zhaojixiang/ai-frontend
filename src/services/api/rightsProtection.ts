@@ -5,7 +5,7 @@ import { serviceUrl } from '@/services/config';
 // 获取订单价保相关信息
 export const getOrderProtection = (params: { orderId: string }, option?: AxiosRequestConfig) => {
   return JOJO.request(params, {
-    baseURL: serviceUrl.order,
+    baseURL: serviceUrl.cashback,
     url: `/orders/${params.orderId}/price-protection`,
     ...option
   });
@@ -14,7 +14,7 @@ export const getOrderProtection = (params: { orderId: string }, option?: AxiosRe
 // 获取订单商品相关信息
 export const getOrderProduct = (params: { orderId: string }, option?: AxiosRequestConfig) => {
   return JOJO.request(params, {
-    baseURL: serviceUrl.order,
+    baseURL: serviceUrl.cashback,
     url: `/orders/${params.orderId}/price-protection`,
     ...option
   });
@@ -32,8 +32,25 @@ export const getOrderRules = (
   option?: AxiosRequestConfig
 ) => {
   return JOJO.request(params, {
-    baseURL: serviceUrl.order,
+    baseURL: serviceUrl.cashback,
     url: `/fe/promotions/${params.promotionId}`,
+    ...option
+  });
+};
+
+export const submitPriceProtection = (
+  params: {
+    orderId: string;
+    promotionId: string | number;
+    promotionVersion: number | string;
+    userAddressId?: string | number;
+    chooseGifts: any;
+  },
+  option?: AxiosRequestConfig
+) => {
+  return JOJO.request(params, {
+    baseURL: serviceUrl.cashback,
+    url: `fe/user/orders/${params?.orderId}/price-protection-records`,
     ...option
   });
 };

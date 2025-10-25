@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { isEmpty } from 'lodash-es';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import ClassIcon from '@/assets/images/jojo/rightsProtection/class.png';
@@ -7,14 +8,17 @@ import GiftIcon from '@/assets/images/jojo/rightsProtection/gift.png';
 import WarnIcon from '@/assets/images/jojo/rightsProtection/warn.png';
 import LoginBar from '@/components/LoginBar';
 import StateHandler, { LoadStatus } from '@/components/StateHandler';
+import Address from '@/modules/Address';
 import {
   getOrderProduct,
   getOrderProtection,
-  getOrderRules
+  getOrderRules,
+  submitPriceProtection
 } from '@/services/api/rightsProtection';
 
 import ChoiceGift from './components/choiceGift';
 import ErrorPage from './components/errorPage';
+import SubmitModal from './components/submitModal';
 import SuccessPage from './components/successPage';
 import styles from './index.module.less';
 
@@ -51,6 +55,7 @@ interface SkuItem {
 const RightsProtection = () => {
   const { orderId } = useParams();
 
+  const [userAddressId, setUserAddressId] = useState<number>();
   // 异常状态页面展示
   const [errorPageStatus, setErrorPageStatus] = useState({
     visible: false,
@@ -84,6 +89,22 @@ const RightsProtection = () => {
     giftList: []
   });
 
+  // 订单是否有地址相关信息
+  const [hasAddress, setHasAddress] = useState(false);
+
+  //填地址dom
+  const addressRef = useRef<any>(null);
+
+  //普通奖池用户选择
+  const [normalChoiceData, setNormalChoiceData] = useState<any>([]);
+  // M选N奖池用户选择
+  const [choicesChoiceData, setChoicesChoiceData] = useState<any>([]);
+
+  const [modalVisible, setModalVisible] = useState(true);
+
+  const timer = useRef<any>(null);
+
+  // 获取到奖池规则
   const getCurrentPromotionList = (discounts: any) => {
     let giftPoolsType = 'NORMAL_GIFT';
     // 获取到命中规则的奖池List
@@ -151,7 +172,19 @@ const RightsProtection = () => {
     };
   };
 
-  // 生成name字符串
+  const [initData, setInitData] = useState<any>({});
+
+  const userHandleClick = useCallback(
+    ({ normalData = [], choicesData = [] }: { normalData: any; choicesData: any }) => {
+      if (normalData.length > 0) {
+        setNormalChoiceData(normalData);
+      }
+      if (choicesData.length > 0) {
+        setChoicesChoiceData(choicesData);
+      }
+    },
+    []
+  );
 
   const initPage = async (oId: string) => {
     try {
@@ -175,6 +208,10 @@ const RightsProtection = () => {
           }),
           getOrderProduct({ orderId: oId })
         ]);
+        setInitData({
+          promotionId,
+          promotionVersion
+        });
 
         const { resultCode: ruleCode, data: ruleData } = ruleRes || {};
         if (ruleCode === 200 && ruleData) {
@@ -194,9 +231,11 @@ const RightsProtection = () => {
         }
         const { resultCode: productCode, data: productdata } = productRes || {};
         if (productCode === 200 && productdata) {
-          const { products } = productdata;
+          const { products, orderAddress } = productdata;
           const productItem = getCurrentProductList(products);
+          const isEmptyOrder = isEmpty(orderAddress);
           setProductData({ productItem, ...createTime });
+          setHasAddress(!isEmptyOrder);
         } else {
           setErrorPageStatus({
             visible: true,
@@ -235,6 +274,71 @@ const RightsProtection = () => {
     }
   };
 
+  // 地址填写后调用
+  const onAddressSubmit = (addressId: number) => {
+    if (addressId) {
+      setUserAddressId(addressId);
+      addressRef.current.destroy();
+      onSure(addressId);
+    }
+  };
+
+  // 确认升级按钮
+  const onSubmit = () => {
+    const normalneedAddress = normalChoiceData.some((item: any) => item.needAddress === true);
+    const choicesneedAddress = choicesChoiceData.some((item: any) => item.needAddress === true);
+    const isNeed = normalneedAddress || choicesneedAddress;
+    if (!hasAddress && !userAddressId && isNeed) {
+      addressRef.current = JOJO.popup(<Address onSubmit={onAddressSubmit} />, {
+        animate: false,
+        bodyStyle: {
+          width: '100vw',
+          height: '100vh',
+          borderRadius: 0,
+          margin: 0,
+          backgroundColor: '#fff'
+        }
+      });
+    }
+    onSure();
+  };
+
+  const jumpToSuccessPage = async () => {
+    if (!orderId) {
+      return;
+    }
+    const OrderProtectionRes = await getOrderProduct({ orderId });
+    const { resultCode, data } = OrderProtectionRes || {};
+    if (resultCode === 200 && data) {
+      const { products } = data;
+      const productItem = getCurrentProductList(products);
+      setProductData({ ...productData, ...productItem });
+      setSuccessPageStatus({
+        visible: true
+      });
+    }
+  };
+
+  const onSure = async (id?: number | string) => {
+    const addressId = id || userAddressId;
+    if (!orderId) {
+      return;
+    }
+    const submitRes = await submitPriceProtection({
+      orderId,
+      userAddressId: addressId,
+      promotionId: initData?.promotionId,
+      promotionVersion: initData?.promotionVersion,
+      chooseGifts: []
+    });
+    const { resultCode, data } = submitRes || {};
+    if (resultCode === 200 && data) {
+      timer.current = setTimeout(() => {
+        jumpToSuccessPage();
+      }, 3000);
+    }
+  };
+
   useEffect(() => {
     if (!orderId) {
       setErrorPageStatus({
@@ -257,11 +361,16 @@ const RightsProtection = () => {
 
   const { classList, giftList } = productData;
 
-  const isEmpty = classList.length === 0 && giftList.length === 0;
+  const Empty = classList.length === 0 && giftList.length === 0;
 
   return (
     <StateHandler options={pageStatus}>
       <main className={styles.main}>
+        <SubmitModal
+          visible={modalVisible}
+          onCancel={() => setModalVisible(false)}
+          onSubmit={onSubmit}
+        />
         <title>{!hasMakeSure ? '权益升级页面' : '权益保障页面'}</title>
         {!hasMakeSure ? (
           <>
@@ -296,7 +405,7 @@ const RightsProtection = () => {
                   <div className={styles.text}>原订单赠送</div>
                 </div>
                 <div className={styles['gift-container']}>
-                  {isEmpty ? (
+                  {Empty ? (
                     <div className={styles['no-gift']}>暂无赠品</div>
                   ) : (
                     <>
@@ -329,7 +438,20 @@ const RightsProtection = () => {
                   <div className={styles.line} />
                   <div className={styles.text}>可更换为</div>
                 </div>
-                <ChoiceGift {...promotionData} />
+                <ChoiceGift
+                  {...promotionData}
+                  onUserHandleClick={userHandleClick}
+                  choicesChoiceData={choicesChoiceData}
+                />
+              </div>
+              <div className={styles['bottom-btn']}>
+                <div
+                  className={styles.btn}
+                  onClick={() => {
+                    setModalVisible(true);
+                  }}>
+                  确认升级赠品
+                </div>
               </div>
             </div>
           </>

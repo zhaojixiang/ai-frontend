@@ -4,6 +4,9 @@
   background: #fcf9de;
   padding: 12px;
   .choice-class {
+    &.choice-class-mix {
+      margin-top: 8px;
+    }
     .choice-class-header {
       display: flex;
       align-items: center;
@@ -59,7 +62,6 @@
   .choice-list {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     flex-wrap: wrap;
 
     .choice-item {
@@ -75,6 +77,9 @@
       align-items: center;
       flex-direction: column;
       background-color: white;
+      &.selected {
+        border: 2px solid #fcda00;
+      }
 
       .choice-item-img-container {
         width: 90px;
@@ -93,6 +98,13 @@
           position: absolute;
           top: 0;
           left: 0;
+        }
+        .select-icon {
+          position: absolute;
+          width: 24px;
+          height: 24px;
+          left: 4px;
+          top: 4px;
         }
       }
       .choice-item-name {
