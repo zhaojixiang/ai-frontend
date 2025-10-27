@@ -77,7 +77,7 @@ const RightsProtection = () => {
     giftPoolsType: '',
     poolNum: 0,
     normalList: [],
-    choicesList: []
+    choiceList: []
   });
   // 订单相关信息
   const [productData, setProductData] = useState({
@@ -100,7 +100,11 @@ const RightsProtection = () => {
   // M选N奖池用户选择
   const [choicesChoiceData, setChoicesChoiceData] = useState<any>([]);
 
-  const [modalVisible, setModalVisible] = useState(true);
+  const [modalStatus, setModalStatus] = useState({
+    visible: false,
+    content: '',
+    btnText: ''
+  });
 
   const timer = useRef<any>(null);
 
@@ -111,7 +115,7 @@ const RightsProtection = () => {
     const hitPromotionList = discounts?.filter((item: any) => item.hitPromotion === true) ?? [];
     const normalList =
       hitPromotionList?.filter((item: any) => item.giftStrategy === 'NORMAL_GIFT') ?? [];
-    const choicesList =
+    const choiceList =
       hitPromotionList?.filter((item: any) => item.giftStrategy === 'CHOICES_GIFT') ?? [];
     if (hitPromotionList.length === 1) {
       giftPoolsType = hitPromotionList[0].giftStrategy;
@@ -146,7 +150,7 @@ const RightsProtection = () => {
     return {
       giftPoolsType,
       normalList,
-      choicesList,
+      choiceList,
       poolNum: hitPromotionList?.length
     };
   };
@@ -186,6 +190,7 @@ const RightsProtection = () => {
     []
   );
 
+  // 初始加载
   const initPage = async (oId: string) => {
     try {
       const OrderProtectionRes = await getOrderProtection({ orderId: oId });
@@ -303,6 +308,7 @@ const RightsProtection = () => {
     onSure();
   };
 
+  //跳转成功页
   const jumpToSuccessPage = async () => {
     if (!orderId) {
       return;
@@ -316,9 +322,18 @@ const RightsProtection = () => {
       setSuccessPageStatus({
         visible: true
       });
+      clearTimeout(timer.current);
+    } else {
+      setModalStatus({
+        visible: true,
+        content: '123123',
+        btnText: '我知道了'
+      });
+      clearTimeout(timer.current);
     }
   };
 
+  // 点击确认按钮
   const onSure = async (id?: number | string) => {
     const addressId = id || userAddressId;
     if (!orderId) {
@@ -335,7 +350,7 @@ const RightsProtection = () => {
     if (resultCode === 200 && data) {
       timer.current = setTimeout(() => {
         jumpToSuccessPage();
-      }, 3000);
+      }, 1000);
     }
   };
 
@@ -367,8 +382,13 @@ const RightsProtection = () => {
     <StateHandler options={pageStatus}>
       <main className={styles.main}>
         <SubmitModal
-          visible={modalVisible}
-          onCancel={() => setModalVisible(false)}
+          {...modalStatus}
+          onCancel={() =>
+            setModalStatus({
+              ...modalStatus,
+              visible: false
+            })
+          }
           onSubmit={onSubmit}
         />
         <title>{!hasMakeSure ? '权益升级页面' : '权益保障页面'}</title>
@@ -448,7 +468,11 @@ const RightsProtection = () => {
                 <div
                   className={styles.btn}
                   onClick={() => {
-                    setModalVisible(true);
+                    setModalStatus({
+                      visible: true,
+                      content: '确认后将为您更换新赠课赠品，原有赠课赠品将会被回收',
+                      btnText: '确认升级'
+                    });
                   }}>
                   确认升级赠品
                 </div>
