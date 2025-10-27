@@ -2,7 +2,7 @@ import { Mask } from 'antd-mobile';
 
 import styles from './index.module.less';
 
-const SubmitModal = (props) => {
+const SubmitModal = (props: any) => {
   const { visible, onCancel, onSubmit, content, btnText } = props;
   return (
     <Mask
