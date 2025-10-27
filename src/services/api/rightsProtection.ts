@@ -54,3 +54,11 @@ export const submitPriceProtection = (
     ...option
   });
 };
+
+export const getApolloBackground = (params: { key: string }, option?: AxiosRequestConfig) => {
+  return JOJO.request(params, {
+    baseURL: serviceUrl.cashback_apollo,
+    url: `get-by-key`,
+    ...option
+  });
+};

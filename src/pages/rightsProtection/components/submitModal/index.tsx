@@ -3,7 +3,7 @@ import { Mask } from 'antd-mobile';
 import styles from './index.module.less';
 
 const SubmitModal = (props: any) => {
-  const { visible, onCancel, onSubmit, content, btnText } = props;
+  const { visible, onCancel, type = 'submit', onSubmit, content, btnText } = props;
   return (
     <Mask
       visible={visible}
@@ -19,7 +19,11 @@ const SubmitModal = (props: any) => {
         <div
           className={styles.btn}
           onClick={() => {
-            onSubmit();
+            if (type === 'submit') {
+              onSubmit();
+            } else {
+              onCancel();
+            }
           }}>
           {btnText ? btnText : '确认升级'}
         </div>

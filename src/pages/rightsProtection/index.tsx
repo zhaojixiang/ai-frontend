@@ -11,6 +11,7 @@ import LoginBar from '@/components/LoginBar';
 import StateHandler, { LoadStatus } from '@/components/StateHandler';
 import Address from '@/modules/Address';
 import {
+  getApolloBackground,
   getOrderProduct,
   getOrderProtection,
   getOrderRules,
@@ -422,8 +423,11 @@ const RightsProtection = () => {
   const [modalStatus, setModalStatus] = useState({
     visible: false,
     content: '',
-    btnText: ''
+    btnText: '',
+    type: 'submit'
   });
+
+  const [bg, setBg] = useState('');
 
   const timer = useRef<any>(null);
 
@@ -553,7 +557,7 @@ const RightsProtection = () => {
   const initPage = async (oId: string) => {
     try {
       const OrderProtectionRes = await getOrderProtection({ orderId: oId });
-      const { resultCode, data } = OrderProtectionRes || {};
+      const { resultCode, data, message } = OrderProtectionRes || {};
       if (resultCode === 200 && data) {
         const {
           status,
@@ -562,7 +566,7 @@ const RightsProtection = () => {
         } = data;
         const { promotionId, promotionVersion, matchCondition } = priceProtectPromotion;
         const { matchSkuList = [], productId, matchedRuleTime } = matchCondition || {};
-        const [ruleRes, productRes] = await Promise.all([
+        const [ruleRes, productRes, apolloRes] = await Promise.all([
           getOrderRules({
             promotionId,
             promotionVersion,
@@ -570,12 +574,18 @@ const RightsProtection = () => {
             productId,
             matchedRuleTime
           }),
-          getOrderProduct({ orderId: oId })
+          getOrderProduct({ orderId: oId }),
+          getApolloBackground({ key: 'price.protection.link.config' })
         ]);
         setInitData({
           promotionId,
           promotionVersion
         });
+        const { resultCode: apolloCode, data: apolloData } = apolloRes;
+        if (apolloCode === 200 && apolloData) {
+          const apolloParseData = JSON.parse(apolloData);
+          setBg(apolloParseData.jojo.coverImageUrl);
+        }
 
         const { resultCode: ruleCode, data: ruleData } = ruleRes || {};
         if (ruleCode === 200 && ruleData) {
@@ -624,11 +634,18 @@ const RightsProtection = () => {
           });
         }
       } else {
-        setErrorPageStatus({
-          visible: true,
-          text: data?.errorMsg || '获取订单保障信息失败',
-          type: 'error'
-        });
+        switch (resultCode) {
+          case 15301:
+            jumpToSuccessPage();
+            break;
+          default:
+            setErrorPageStatus({
+              visible: true,
+              text: message || '出错了，请重试',
+              type: 'error'
+            });
+            break;
+        }
         setPageStatus({
           status: LoadStatus.Success
         });
@@ -691,14 +708,19 @@ const RightsProtection = () => {
       setSuccessPageStatus({
         visible: true
       });
-      clearTimeout(timer.current);
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
     } else {
       setModalStatus({
         visible: true,
-        content: '123123',
-        btnText: '我知道了'
+        content: '出错了，请重试',
+        btnText: '我知道了',
+        type: 'error'
       });
-      clearTimeout(timer.current);
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
     }
   };
 
@@ -715,11 +737,18 @@ const RightsProtection = () => {
       promotionVersion: initData?.promotionVersion,
       chooseGifts: []
     });
-    const { resultCode, data } = submitRes || {};
+    const { resultCode, data, message } = submitRes || {};
     if (resultCode === 200 && data) {
       timer.current = setTimeout(() => {
         jumpToSuccessPage();
       }, 1000);
+    } else {
+      setModalStatus({
+        visible: true,
+        content: message || '出错了，请重试',
+        btnText: '我知道了',
+        type: 'error'
+      });
     }
   };
 
@@ -733,7 +762,6 @@ const RightsProtection = () => {
       return;
     }
     const b = getCurrentPromotionList(a);
-    console.log(b, 'i am b');
 
     setPromotionData(b);
 
@@ -751,8 +779,6 @@ const RightsProtection = () => {
   const { classList, giftList } = productData;
 
   const Empty = classList.length === 0 && giftList.length === 0;
-
-  console.log(choicesChoiceData, 'ia m choicesChoiceData');
 
   return (
     <StateHandler options={pageStatus}>
@@ -865,7 +891,7 @@ const RightsProtection = () => {
           <>
             <div className={styles['protection-container']}>
               <LoginBar isPopLogin={false} onLoginSuccess={() => window.location.reload()} />
-              <img src={''} alt='' className={styles['protection-img']} />
+              <img src={bg} alt='' className={styles['protection-img']} />
               <div
                 className={styles.btn}
                 onClick={() => {
