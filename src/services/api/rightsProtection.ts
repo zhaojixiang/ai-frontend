@@ -6,7 +6,8 @@ import { serviceUrl } from '@/services/config';
 export const getOrderProtection = (params: { orderId: string }, option?: AxiosRequestConfig) => {
   return JOJO.request(params, {
     baseURL: serviceUrl.cashback,
-    url: `/fe/user/orders/${params.orderId}/price-protection`,
+
+    url: `api/fe/user/orders/${params.orderId}/price-protection`,
     ...option
   });
 };
@@ -15,7 +16,7 @@ export const getOrderProtection = (params: { orderId: string }, option?: AxiosRe
 export const getOrderProduct = (params: { orderId: string }, option?: AxiosRequestConfig) => {
   return JOJO.request(params, {
     baseURL: serviceUrl.cashback,
-    url: `/fe/user/orders/${params.orderId}/price-protection`,
+    url: `api/fe/user/orders/${params.orderId}/products`,
     ...option
   });
 };
@@ -33,7 +34,7 @@ export const getOrderRules = (
 ) => {
   return JOJO.request(params, {
     baseURL: serviceUrl.lego,
-    url: `/fe/promotions/${params.promotionId}`,
+    url: `/fe/user/promotions/${params.promotionId}`,
     ...option
   });
 };
@@ -50,7 +51,8 @@ export const submitPriceProtection = (
 ) => {
   return JOJO.request(params, {
     baseURL: serviceUrl.cashback,
-    url: `fe/user/orders/${params?.orderId}/price-protection-records`,
+    url: `/api/fe/user/orders/${params?.orderId}/price-protection`,
+    method: 'POST',
     ...option
   });
 };

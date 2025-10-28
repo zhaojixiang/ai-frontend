@@ -69,11 +69,7 @@ const ChoiceGift = (props: any) => {
     const defaultChoiceData: any = [];
 
     if (Array.isArray(normalList) && normalList.length > 0) {
-      // const flatGiftPools = normalList
-      //   .filter((item) => item.giftPools?.length > 0)
-      //   .flatMap((item) => item.giftPools);
       // 遍历所有赠品池
-
       normalList?.forEach((poolItem) => {
         const isneedAddress =
           poolItem?.giftSkus?.some((skusItem: GiftSku) => skusItem?.skuType === 'ENTITY') || false;
@@ -100,23 +96,13 @@ const ChoiceGift = (props: any) => {
       });
     }
     if (Array.isArray(choiceList) && choiceList.length > 0) {
-      // const flatGiftPools = choiceList
-      //   .filter((item) => item.giftPools?.length > 0)
-      //   .flatMap((item) => item.giftPools);
       choiceList?.forEach((poolItem) => {
-        // const choiceClassList = poolItem.giftSkus.filter((sku) => sku.resourcePlatform === 1);
-        // const choiceGiftList = poolItem.giftSkus.filter((sku) => sku.resourcePlatform !== 1);
         defaultChoiceData.push({
           poolId: poolItem?.poolId,
           skuIds: [],
           giftOptionalNum: poolItem?.giftOptionalNum,
           needAddress: false
         });
-        // return {
-        // ...poolItem
-        // choiceClassList,
-        // choiceGiftList
-        // };
       });
       setChoicePools(choiceList);
     }
@@ -143,7 +129,11 @@ const ChoiceGift = (props: any) => {
             )}
             <div className={styles['choice-list']} key='normal-choice-class-list'>
               {normalClassList?.map((item: GiftSku) => {
-                const isEmpty = item?.giftMaxNum - item?.giftUsedNum <= 0;
+                let isEmpty = item?.giftMaxNum - item?.giftUsedNum <= 0;
+                if (item.giftMaxNum === null) {
+                  isEmpty = false;
+                }
+
                 return (
                   <div className={styles['choice-item']} key={item?.skuId}>
                     <div className={styles['choice-item-img-container']}>
@@ -165,7 +155,10 @@ const ChoiceGift = (props: any) => {
             )}
             <div className={styles['choice-list']} key='normal-choice-gift-list'>
               {normalGiftList?.map((item: GiftSku) => {
-                const isEmpty = item?.giftMaxNum - item?.giftUsedNum <= 0;
+                let isEmpty = item?.giftMaxNum - item?.giftUsedNum <= 0;
+                if (item.giftMaxNum === null) {
+                  isEmpty = false;
+                }
                 return (
                   <div className={styles['choice-item']} key={item?.skuId}>
                     <div className={styles['choice-item-img-container']}>
@@ -208,7 +201,10 @@ const ChoiceGift = (props: any) => {
 
                   <div className={styles['choice-list']} key={'mn-choice-class-list'}>
                     {giftSkus?.map((item: GiftSku) => {
-                      const isEmpty = item?.giftMaxNum - item?.giftUsedNum <= 0;
+                      let isEmpty = item?.giftMaxNum - item?.giftUsedNum <= 0;
+                      if (item.giftMaxNum === null) {
+                        isEmpty = false;
+                      }
                       const Selected = selectedSkuIds.includes(item?.skuId);
                       return (
                         <div

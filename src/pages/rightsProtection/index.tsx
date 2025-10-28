@@ -20,6 +20,7 @@ import {
 
 import ChoiceGift from './components/choiceGift';
 import ErrorPage from './components/errorPage';
+import Skeleton from './components/Skeleton';
 import SubmitModal from './components/submitModal';
 import SuccessPage from './components/successPage';
 import styles from './index.module.less';
@@ -388,7 +389,8 @@ const RightsProtection = () => {
   });
   // 页面加载状态
   const [pageStatus, setPageStatus] = useState({
-    status: LoadStatus.Success
+    status: LoadStatus.Loading,
+    loadingElement: <Skeleton />
   });
   // 是否已阅读并同意规则
   const [hasMakeSure, setHaseMakeSure] = useState(false);
@@ -524,11 +526,11 @@ const RightsProtection = () => {
       productList.find((product: any) => product?.skus.some((sku: any) => sku.gift !== true)) ?? [];
     const { productId, productName, headImageUrl, skus } = targetProduct;
     // 获取非主品list
-    const skuList = skus?.filter((sku: any) => sku.gift === true);
+    const skuList = skus?.filter((sku: any) => sku.gift === true) ?? [];
     // 获取赠课list
-    const classList = skuList?.filter((sku: any) => sku.resourcePlatform === 1);
+    const classList = skuList?.filter((sku: any) => sku.resourcePlatform === 1) ?? [];
     // 获取赠品list
-    const giftList = skuList?.filter((sku: any) => sku.resourcePlatform !== 1);
+    const giftList = skuList?.filter((sku: any) => sku.resourcePlatform !== 1) ?? [];
     return {
       productId,
       productName,
@@ -557,20 +559,21 @@ const RightsProtection = () => {
   const initPage = async (oId: string) => {
     try {
       const OrderProtectionRes = await getOrderProtection({ orderId: oId });
-      const { resultCode, data, message } = OrderProtectionRes || {};
+
+      const { resultCode, data, errorMsg } = OrderProtectionRes || {};
       if (resultCode === 200 && data) {
         const {
-          status,
           createTime,
           priceProtectPromotion = {} // 价保的促销信息
         } = data;
         const { promotionId, promotionVersion, matchCondition } = priceProtectPromotion;
-        const { matchSkuList = [], productId, matchedRuleTime } = matchCondition || {};
+
+        const { skuInfoList = [], productId, matchedRuleTime } = matchCondition || {};
         const [ruleRes, productRes, apolloRes] = await Promise.all([
           getOrderRules({
             promotionId,
             promotionVersion,
-            skuList: JSON.stringify(matchSkuList),
+            skuList: encodeURIComponent(JSON.stringify(skuInfoList)),
             productId,
             matchedRuleTime
           }),
@@ -587,8 +590,9 @@ const RightsProtection = () => {
           setBg(apolloParseData.jojo.coverImageUrl);
         }
 
-        const { resultCode: ruleCode, data: ruleData } = ruleRes || {};
-        if (ruleCode === 200 && ruleData) {
+        const { code: ruleCode, data: ruleData } = ruleRes || {};
+
+        if (ruleCode === 'SUCCESS' && ruleData) {
           const { skuDiscounts } = ruleData;
           const proData = getCurrentPromotionList(skuDiscounts);
           setPromotionData(proData);
@@ -599,7 +603,8 @@ const RightsProtection = () => {
             type: 'error'
           });
           setPageStatus({
-            status: LoadStatus.Success
+            status: LoadStatus.Success,
+            loadingElement: <Skeleton />
           });
           return;
         }
@@ -607,8 +612,9 @@ const RightsProtection = () => {
         if (productCode === 200 && productdata) {
           const { products, orderAddress } = productdata;
           const productItem = getCurrentProductList(products);
+
           const isEmptyOrder = isEmpty(orderAddress);
-          setProductData({ productItem, ...createTime });
+          setProductData({ ...productItem, ...createTime });
           setHasAddress(!isEmptyOrder);
         } else {
           setErrorPageStatus({
@@ -617,22 +623,15 @@ const RightsProtection = () => {
             type: 'error'
           });
           setPageStatus({
-            status: LoadStatus.Success
+            status: LoadStatus.Success,
+            loadingElement: <Skeleton />
           });
           return;
         }
         setPageStatus({
-          status: LoadStatus.Success
+          status: LoadStatus.Success,
+          loadingElement: <Skeleton />
         });
-
-        if (status === 'FINISHED') {
-          setSuccessPageStatus({
-            visible: true
-          });
-          setPageStatus({
-            status: LoadStatus.Success
-          });
-        }
       } else {
         switch (resultCode) {
           case 15301:
@@ -641,17 +640,22 @@ const RightsProtection = () => {
           default:
             setErrorPageStatus({
               visible: true,
-              text: message || '出错了，请重试',
+              text: errorMsg || '出错了，请重试',
               type: 'error'
             });
             break;
         }
         setPageStatus({
-          status: LoadStatus.Success
+          status: LoadStatus.Success,
+          loadingElement: <Skeleton />
         });
       }
     } catch (error) {
-      console.log(error, 'i am what');
+      setErrorPageStatus({
+        visible: true,
+        text: error?.errorMsg || error?.message || '出错了，请重试',
+        type: 'error'
+      });
     }
   };
 
@@ -671,6 +675,7 @@ const RightsProtection = () => {
       setUserAddressId(addressId);
       addressRef.current.destroy();
       onSure(addressId);
+      JOJO.loading.show({ content: '赠品升级中' });
     }
   };
 
@@ -680,6 +685,10 @@ const RightsProtection = () => {
     const choicesneedAddress = choicesChoiceData.some((item: any) => item.needAddress === true);
     const isNeed = normalneedAddress || choicesneedAddress;
     if (!hasAddress && !userAddressId && isNeed) {
+      setModalStatus({
+        ...modalStatus,
+        visible: false
+      });
       addressRef.current = JOJO.popup(<Address onSubmit={onAddressSubmit} />, {
         animate: false,
         bodyStyle: {
@@ -699,6 +708,7 @@ const RightsProtection = () => {
     if (!orderId) {
       return;
     }
+
     const OrderProtectionRes = await getOrderProduct({ orderId });
     const { resultCode, data } = OrderProtectionRes || {};
     if (resultCode === 200 && data) {
@@ -728,21 +738,34 @@ const RightsProtection = () => {
   const onSure = async (id?: number | string) => {
     const addressId = id || userAddressId;
     if (!orderId) {
+      JOJO.loading.close();
       return;
     }
-    const submitRes = await submitPriceProtection({
+    const reqParams: any = {
       orderId,
       userAddressId: addressId,
       promotionId: initData?.promotionId,
-      promotionVersion: initData?.promotionVersion,
-      chooseGifts: []
-    });
+      promotionVersion: initData?.promotionVersion
+    };
+    if (choicesChoiceData.length > 0) {
+      const paramsdata = choicesChoiceData.map((item) => {
+        return {
+          poolId: item.poolId,
+          skuIds: item.skuIds
+        };
+      });
+      reqParams.chooseGifts = paramsdata;
+    }
+    const submitRes = await submitPriceProtection(reqParams);
     const { resultCode, data, message } = submitRes || {};
     if (resultCode === 200 && data) {
       timer.current = setTimeout(() => {
         jumpToSuccessPage();
+        JOJO.loading.close();
       }, 1000);
     } else {
+      JOJO.loading.close();
+
       setModalStatus({
         visible: true,
         content: message || '出错了，请重试',
@@ -778,8 +801,7 @@ const RightsProtection = () => {
 
   const { classList, giftList } = productData;
 
-  const Empty = classList.length === 0 && giftList.length === 0;
-
+  const Empty = classList?.length === 0 && giftList?.length === 0;
   return (
     <StateHandler options={pageStatus}>
       <SubmitModal
@@ -793,7 +815,7 @@ const RightsProtection = () => {
         onSubmit={onSubmit}
       />
       <main className={styles.main}>
-        <title>{!hasMakeSure ? '权益升级页面' : '权益保障页面'}</title>
+        <title>{hasMakeSure ? '权益升级页面' : '权益保障页面'}</title>
 
         {hasMakeSure ? (
           <>
@@ -832,7 +854,7 @@ const RightsProtection = () => {
                     <div className={styles['no-gift']}>暂无赠品</div>
                   ) : (
                     <>
-                      {classList.length > 0 && (
+                      {classList?.length > 0 && (
                         <div className={styles['class-gift']}>
                           <div className={styles['class-icon']}>
                             <img src={ClassIcon} alt='' className={styles['class-img']} />
@@ -842,7 +864,7 @@ const RightsProtection = () => {
                         </div>
                       )}
 
-                      {giftList.length > 0 && (
+                      {giftList?.length > 0 && (
                         <div className={styles['product-gift']}>
                           <div className={styles['product-icon']}>
                             <img src={GiftIcon} alt='' className={styles['product-img']} />

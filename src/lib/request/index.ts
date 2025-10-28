@@ -19,7 +19,7 @@ const userId = localStorage.getItem('userId');
 // 模拟调试header信息，跳过授权检测
 export const DEBUG_HEADER_INFO = Os.debug
   ? {
-      'X-UAGW-userId': userId || '70010048',
+      'X-UAGW-userId': userId || '200051446',
       'X-UAGW-authMode': 1
     }
   : {};
@@ -52,17 +52,17 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   async (response: AxiosResponse) => {
-    const { resultCode, errorMsg, status } = response.data;
+    const { resultCode, code, errorMsg, status } = response.data;
 
     // 请求成功
-    if (resultCode === 200) {
+    if (resultCode === 200 || code === 'SUCCESS') {
       return response.data;
     }
     // 当接口有返回但是我们服务端处理失败时，我们需要根据配置来判断是否展示错误提示，默认展示，
     // 可以在请求时配置 hideError: true 来隐藏错误提示
-    if (resultCode !== 200 && response.config?.hideError !== true) {
-      toast.show({ icon: 'fail', content: errorMsg || '请求失败' });
-    }
+    // if (resultCode !== 200 && response.config?.hideError !== true) {
+    //   toast.show({ icon: 'fail', content: errorMsg || '请求失败' });
+    // }
     // 未登录
     if ([1001, 1005].includes(status)) {
       toast.show({ icon: 'fail', content: errorMsg || '未登录' });
@@ -96,7 +96,8 @@ instance.interceptors.response.use(
       window.location.replace(redirectUrl);
       return Promise.reject(new Error(errorMsg || '需要获取openId'));
     }
-    return Promise.reject(response.data);
+
+    return response.data;
   },
   (error) => {
     toast.show({ icon: 'fail', content: error.message || '网络错误' });
