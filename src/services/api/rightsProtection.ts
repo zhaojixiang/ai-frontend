@@ -21,8 +21,6 @@ export const getOrderProduct = (params: { orderId: string }, option?: AxiosReque
   });
 };
 
-
-
 // 获取促销规则
 export const getOrderRules = (
   params: {
