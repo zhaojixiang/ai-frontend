@@ -264,13 +264,15 @@ const RightsProtection = () => {
     // 获取到订单内容
     const targetProduct =
       productList.find((product: any) => product?.skus.some((sku: any) => sku.gift !== true)) ?? [];
-    const { productId, productName, headImageUrl, skus } = targetProduct;
-    // 获取非主品list
-    const skuList = skus?.filter((sku: any) => sku.gift === true) ?? [];
+    const { productId, productName, headImageUrl } = targetProduct;
+
+    const allSkuList =
+      productList.flatMap((item: any) => item.skus).filter((sku: any) => sku.gift === true) ?? [];
+
     // 获取赠课list
-    const classList = skuList?.filter((sku: any) => sku.resourcePlatform === 1) ?? [];
+    const classList = allSkuList?.filter((sku: any) => sku.resourcePlatform === 1) ?? [];
     // 获取赠品list
-    const giftList = skuList?.filter((sku: any) => sku.resourcePlatform !== 1) ?? [];
+    const giftList = allSkuList?.filter((sku: any) => sku.resourcePlatform !== 1) ?? [];
     return {
       productId,
       productName,
@@ -383,12 +385,12 @@ const RightsProtection = () => {
               text: errorMsg || '出错了，请重试',
               type: 'error'
             });
+            setPageStatus({
+              status: LoadStatus.Success,
+              loadingElement: <Skeleton />
+            });
             break;
         }
-        setPageStatus({
-          status: LoadStatus.Success,
-          loadingElement: <Skeleton />
-        });
       }
     } catch (error) {
       setErrorPageStatus({
@@ -441,6 +443,7 @@ const RightsProtection = () => {
       });
     }
     onSure();
+    JOJO.loading.show({ content: '赠品升级中' });
   };
 
   //跳转成功页
@@ -458,6 +461,10 @@ const RightsProtection = () => {
       setSuccessPageStatus({
         visible: true
       });
+      setPageStatus({
+        status: LoadStatus.Success,
+        loadingElement: <Skeleton />
+      });
       if (timer.current) {
         clearTimeout(timer.current);
       }
@@ -467,6 +474,10 @@ const RightsProtection = () => {
         content: '出错了，请重试',
         btnText: '我知道了',
         type: 'error'
+      });
+      setPageStatus({
+        status: LoadStatus.Success,
+        loadingElement: <Skeleton />
       });
       if (timer.current) {
         clearTimeout(timer.current);
