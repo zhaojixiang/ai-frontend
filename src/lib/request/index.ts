@@ -19,7 +19,7 @@ const userId = localStorage.getItem('userId');
 // 模拟调试header信息，跳过授权检测
 export const DEBUG_HEADER_INFO = Os.debug
   ? {
-      'X-UAGW-userId': userId || '200051446',
+      'X-UAGW-userId': userId,
       'X-UAGW-authMode': 1
     }
   : {};
