@@ -45,7 +45,7 @@ const SuccessPage = (props: any) => {
               <div className={styles.text}>新赠品</div>
             </div>
             <div className={styles['gift-container']}>
-              {!isEmpty ? (
+              {isEmpty ? (
                 <div className={styles['no-gift']}>暂无赠品</div>
               ) : (
                 <>

@@ -31,7 +31,7 @@ const ChoiceGift = (props: any) => {
 
   const onHanldeClick = (poolId: number, skuId: number, needAddress: boolean) => {
     const newlist = cloneDeep(choicesChoiceData);
-    const isEditeItem = newlist.find((item: GiftPool) => item.poolId === poolId);
+    const isEditeItem = newlist?.find((item: GiftPool) => item.poolId === poolId) ?? {};
     if (!Array.isArray(isEditeItem?.skuIds) || isEditeItem.length === 0) {
       Toast.show({
         content: '出错了，请重试',

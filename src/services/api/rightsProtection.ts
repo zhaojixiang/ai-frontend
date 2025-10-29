@@ -7,7 +7,7 @@ export const getOrderProtection = (params: { orderId: string }, option?: AxiosRe
   return JOJO.request(params, {
     baseURL: serviceUrl.cashback,
 
-    url: `api/fe/user/orders/${params.orderId}/price-protection`,
+    url: `/api/fe/user/orders/${params.orderId}/price-protection`,
     ...option
   });
 };
@@ -16,10 +16,12 @@ export const getOrderProtection = (params: { orderId: string }, option?: AxiosRe
 export const getOrderProduct = (params: { orderId: string }, option?: AxiosRequestConfig) => {
   return JOJO.request(params, {
     baseURL: serviceUrl.cashback,
-    url: `api/fe/user/orders/${params.orderId}/products`,
+    url: `/api/fe/user/orders/${params.orderId}/products`,
     ...option
   });
 };
+
+
 
 // 获取促销规则
 export const getOrderRules = (
@@ -60,7 +62,7 @@ export const submitPriceProtection = (
 export const getApolloBackground = (params: { key: string }, option?: AxiosRequestConfig) => {
   return JOJO.request(params, {
     baseURL: serviceUrl.cashback_apollo,
-    url: `get-by-key`,
+    url: `/get-by-key`,
     ...option
   });
 };
