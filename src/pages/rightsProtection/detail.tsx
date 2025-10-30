@@ -9,8 +9,12 @@ import GiftIcon from '@/assets/images/jojo/rightsProtection/gift.png';
 import WarnIcon from '@/assets/images/jojo/rightsProtection/warn.png';
 import FixBottom from '@/components/FixBottom';
 import StateHandler, { LoadStatus } from '@/components/StateHandler';
-import { sensClickInitiative, sensElementView, sensPageView } from '@/lib/utils/sensors';
 import Address from '@/modules/Address';
+import {
+  sensClickInitiative,
+  sensElementView,
+  sensPageView
+} from '@/pages/rightsProtection/sensors';
 import {
   getOrderProduct,
   getOrderProtection,
