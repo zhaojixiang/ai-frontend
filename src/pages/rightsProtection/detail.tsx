@@ -1,4 +1,4 @@
-import { Toast } from 'antd-mobile';
+import { Button, Toast } from 'antd-mobile';
 import dayjs from 'dayjs';
 import { cloneDeep, isEmpty } from 'lodash-es';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -626,7 +626,8 @@ const RightsProtectionDetail = () => {
           </div>
           <FixBottom>
             <div className={styles['bottom-btn']}>
-              <div
+              <Button
+                shape='rounded'
                 className={styles.btn}
                 onClick={() => {
                   const isSelectAll = getSelectStatus();
@@ -642,7 +643,7 @@ const RightsProtectionDetail = () => {
                   });
                 }}>
                 确认升级赠品
-              </div>
+              </Button>
             </div>
           </FixBottom>
         </div>
