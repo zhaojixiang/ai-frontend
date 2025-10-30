@@ -33,9 +33,6 @@ const SuccessPage = (props: any) => {
                 {productName ||
                   '阅读全年系统包-5阶阅读全年系统包-5阶阅读全年系统包-5阶阅读全年系统包-5阶'}
               </div>
-              <div className={styles['success-page-content-main-time']}>
-                下单时间：{dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}
-              </div>
             </div>
           </div>
 
