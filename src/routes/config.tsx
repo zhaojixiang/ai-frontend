@@ -10,7 +10,7 @@ const Rules = lazy(() => import('@/pages/coupon/Rules'));
 const DeliveryDetail = lazy(() => import('@/pages/delivery/Detail'));
 const CreateOrder = lazy(() => import('@/pages/order/Create'));
 const RightsProtection = lazy(() => import('@/pages/rightsProtection'));
-
+const NotFound = lazy(() => import('@/pages/NotFount'));
 export const routes = [
   {
     path: '/',
@@ -29,12 +29,13 @@ export const routes = [
       },
       { path: '/delivery/detail', element: <DeliveryDetail /> },
       {
-        path: 'rightsProtection',
+        path: '/rightsProtection',
         children: [
-          { index: true, element: <RightsProtection /> }, // 直接渲染 RightsProtection
-          { path: ':orderId', element: <RightsProtection /> } // 动态路由
+          { path: ':orderId', element: <RightsProtection /> }, // 动态路由,
+          { path: '', element: <NotFound /> }
         ]
-      }
+      },
+      { path: '*', element: <NotFound /> }
     ]
   }
 ];
