@@ -2,8 +2,8 @@
 import { type ToastShowProps } from 'antd-mobile';
 import { type AxiosRequestConfig } from 'axios';
 
+import { type NavigatorConfig } from './lib/navigate';
 import { type OS } from './lib/os/index.d';
-import { type ShowPageConfig } from './lib/showPage';
 import { type Utils } from './lib/utils/index.d';
 
 // 扩展 Axios 类型
@@ -22,15 +22,19 @@ declare global {
     show: (options?: ToastShowProps) => void;
     close: () => void;
   };
+  type PopupType = {
+    (content: React.ReactNode, options?: FullScreenPopupOptions): { destroy: () => void };
+    confirm: (options: PopupConfirmOptions) => { destroy: () => void };
+  };
   interface JOJOTYPE {
     Os: OS;
     loading: LoadingType;
     Utils: Utils;
     request: <T = any>(params: any, config?: AxiosRequestConfig) => Promise<T>;
-    showPage: (url: string, { to, mode = 'navigate', params = {} }?: ShowPageConfig) => void;
+    navigate: (url: string, { to, mode = 'navigate', params = {} }?: NavigatorConfig) => void;
     toast: ToastType;
     bridge: any;
-    popup: (content: React.ReactNode, options?: FullScreenPopupOptions) => { destroy: () => void };
+    popup: PopupType;
   }
   /**
    * jojo

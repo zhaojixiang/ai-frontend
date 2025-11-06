@@ -217,12 +217,12 @@ export default function Detail() {
       url
     )}&fromType=mall`;
     if (JOJO.Os.jojoReadApp) {
-      JOJO.showPage(url, {
+      JOJO.navigate(url, {
         mode: 'replace',
         to: 'flutter'
       });
     } else {
-      JOJO.showPage(url, {
+      JOJO.navigate(url, {
         mode: 'replace',
         to: 'externalWeb'
       });

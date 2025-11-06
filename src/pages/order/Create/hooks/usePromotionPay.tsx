@@ -1,22 +1,20 @@
-import { Modal } from 'antd-mobile';
 import type React from 'react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
-import { aliPay } from '@/modules/pay';
+import { aliPay, wxPay } from '@/modules/pay';
 import { createOrder, preCheck } from '@/services/api/order';
 import { getOrderPayOrCreate, getPaiedBillInfo, getPayedOrderInfo } from '@/services/api/orderPay';
 import { UNBIND_URL } from '@/services/config';
 
-import type { ScanPayDataProps } from '../type';
+import RiseInPricePop from '../components/RiseInPricePop';
+import type { CreateOrderProps, PayParams } from '../type';
 import { toPayAfter } from '../utils';
 
 interface IProps {
   canLeave: React.MutableRefObject<boolean>;
-  query: any;
   address: any;
-  detail: any;
   payWays: any;
-  curPayWay: number;
+  shizi_url: string;
   toAddress?: (item: any, isEdit: boolean) => void;
   setRiseInPriceVisible?: (visible: boolean) => void;
   setPayResultVisible?: (visible: boolean) => void;
@@ -32,14 +30,12 @@ interface IProps {
 
 export default (props: IProps) => {
   const {
-    query,
     address,
-    detail,
     // setRiseInPriceVisible,
     toAddress,
     payWays,
-    curPayWay,
-    canLeave
+    canLeave,
+    shizi_url
     // setPayResultVisible,
     // setValidatePricePopVisible,
     // setTipVisible,
@@ -50,9 +46,6 @@ export default (props: IProps) => {
     // setVerifyFailVisible,
     // setPayComfirmLoading
   } = props;
-  const { orderSource, skuId, payMode, shizi_url } = query;
-
-  const [priceComparisonInfo, setPriceComparisonInfo] = useState();
 
   const orderIdRef = useRef(null);
   const orderDataRef = useRef(null);
@@ -61,7 +54,18 @@ export default (props: IProps) => {
   const pollingCountRef = useRef(0);
   const isAlReadyShowvalidatePricePopRef = useRef(false);
 
-  const _createOrder: any = async (params: any) => {
+  const _createOrder: any = async (params: CreateOrderProps) => {
+    const {
+      payWay,
+      skuId,
+      orderSource,
+      payMode,
+      totalAmount,
+      externalProductCode,
+      onShowValidatePricePop,
+      onShowActivityChangePop
+    } = params;
+
     JOJO.loading.show({
       content: '支付中...'
     });
@@ -73,7 +77,7 @@ export default (props: IProps) => {
     if (!isAlReadyShowvalidatePricePopRef.current) {
       try {
         const res1 = await preCheck({
-          payAmount: detail.totalCast,
+          payAmount: totalAmount,
           skuId,
           payMode,
           orderSourceCode: orderSource,
@@ -83,8 +87,7 @@ export default (props: IProps) => {
           JOJO.loading.close();
           _createOrder.requesting = false;
           isAlReadyShowvalidatePricePopRef.current = true;
-          setPriceComparisonInfo(res1?.data);
-          // setValidatePricePopVisible(true);
+          onShowValidatePricePop(res1?.data);
           return;
         }
       } catch (error) {
@@ -95,10 +98,9 @@ export default (props: IProps) => {
       _createOrder.requesting = false;
       if (resultCode === 1505030140) {
         JOJO.loading.close();
-        // setActivityChangeContent(errorMsg);
-        // setActivityChangeVisible(true);
-        const { giftPools, ...rest } = query;
-        JOJO.showPage(`/order/create`, {
+        onShowActivityChangePop(errorMsg);
+        const { giftPools, ...rest } = JOJO.Utils.getQuery();
+        JOJO.navigate(`/order/create`, {
           params: rest,
           mode: 'replace'
         });
@@ -115,13 +117,25 @@ export default (props: IProps) => {
       // 涨价提示
       if (resultCode === 666) {
         JOJO.loading.close();
-        // setRiseInPriceVisible(true);
+        const pop = JOJO.popup(<RiseInPricePop onClose={() => pop.destroy()} />, {
+          animate: true,
+          bodyStyle: {
+            width: '100vw',
+            height: '100vh',
+            borderRadius: 0,
+            margin: 0,
+            backgroundColor: 'transparent',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }
+        });
         return;
       }
       // 3001 子账号购买
       if (resultCode === 3001) {
         JOJO.loading.close();
-        Modal.confirm({
+        JOJO.popup.confirm({
           title: '提示',
           content: '你当前是子账号状态，不能单独购买商品，如需购买商品，需要解绑账号后重试',
           onConfirm: () => {
@@ -136,11 +150,12 @@ export default (props: IProps) => {
       // 台湾地址缺少证件号
       if (resultCode === 4001) {
         JOJO.loading.close();
-        Modal.confirm({
+        JOJO.popup.confirm({
           title: '提示',
           content: '根据国家政策要求，发往台湾地区的快件需填写证件号码，请您补充填写',
           onConfirm: () => {
-            toAddress({ id: address?.id }, true);
+            // TODO
+            // toAddress({ id: address?.id }, true);
           },
           onCancel: () => {}
         });
@@ -154,9 +169,9 @@ export default (props: IProps) => {
           icon: 'fail',
           content: '抱歉，价格已发生变化!'
         });
-        delete query.cpId;
-        JOJO.showPage(`/order/create`, {
-          params: query,
+        const { cpId, ...rest } = JOJO.Utils.getQuery();
+        JOJO.navigate(`/order/create`, {
+          params: rest,
           mode: 'replace'
         });
         return;
@@ -206,7 +221,7 @@ export default (props: IProps) => {
         orderDataRef.current = newData;
 
         // 先学后付 直接跳转加班加老师
-        if (Number(curPayWay) === 999) {
+        if (payWay === 999) {
           JOJO.loading.close();
           toPayAfter({
             data: newData,
@@ -227,7 +242,13 @@ export default (props: IProps) => {
             orderId
           } as any);
         } else {
-          toPay();
+          toPay({
+            orderId,
+            totalAmount,
+            payWay,
+            orderPayId: orderPayIdRef.current,
+            externalProductCode
+          });
         }
       });
     });
@@ -264,15 +285,16 @@ export default (props: IProps) => {
   /**
    * 确认支付
    */
-  const toPay: any = async (payWay: number) => {
+  const toPay: any = async (params: PayParams) => {
+    const { orderId, totalAmount, payWay, orderPayId, externalProductCode, orderSource } = params;
+    console.log(222223, params);
+
     canLeave.current = true;
     if (toPay?.requesting) {
       return;
     }
 
-    const innerPayWay = payWay || curPayWay;
-
-    if (!detail?.externalProductCode && [160, 180].includes(innerPayWay)) {
+    if (!externalProductCode && [160, 180].includes(payWay)) {
       JOJO.toast.show({
         icon: 'fail',
         content: '内购商品已失效'
@@ -281,31 +303,26 @@ export default (props: IProps) => {
       return;
     }
     toPay.requesting = true;
-    const params = {
-      query,
-      orderId: query?.orderId || orderIdRef.current,
-      totalAmount: query?.totalAmount || detail?.totalCast,
-      payWay: innerPayWay,
-      orderPayId: query?.orderPayId || orderPayIdRef.current,
-      showPayModel,
-      cancelRequesting: () => {
-        toPay.requesting = false;
+    JOJO.navigate(`/order/create`, {
+      params: {
+        ...JOJO.Utils.getQuery(),
+        orderId,
+        payWay,
+        orderPayId,
+        totalAmount,
+        isAlreadyCreateOrder: 1
       },
-      continueRequesting: () => {
-        toPay.requesting = true;
-      }
-    };
-    console.log(111111, innerPayWay);
-
+      mode: 'replace'
+    });
     try {
-      if (innerPayWay === 160) {
-        JOJO.showPage(`/order/create`, {
+      if (payWay === 160) {
+        JOJO.navigate(`/order/create`, {
           params: {
-            ...query,
-            orderId: params.orderId,
+            ...JOJO.Utils.getQuery(),
+            orderId,
             payWay,
-            orderPayId: params.orderPayId,
-            totalAmount: params.totalAmount,
+            orderPayId,
+            totalAmount,
             isAlreadyCreateOrder: 1
           },
           mode: 'replace'
@@ -315,9 +332,9 @@ export default (props: IProps) => {
 
         // applePayV2({
         //   payEnv: 3,
-        //   payWay: params.payWay,
-        //   orderPayId: params.orderPayId,
-        //   externalProductCode: detail?.externalProductCode,
+        //   payWay,
+        //   orderPayId,
+        //   externalProductCode,
         //   onSuccess: () => {
         //     listenOrRemovePayment(false);
         //     JOJO.loading.close()
@@ -339,25 +356,25 @@ export default (props: IProps) => {
         //     }
         //   }
         // });
-      } else if (innerPayWay === 180) {
+      } else if (payWay === 180) {
         // 谷歌支付
         listenOrRemovePayment(true);
-        JOJO.showPage(`/order/create`, {
+        JOJO.navigate(`/order/create`, {
           params: {
-            ...query,
-            orderId: params.orderId,
+            ...JOJO.Utils.getQuery(),
+            orderId,
             payWay,
-            orderPayId: params.orderPayId,
-            totalAmount: params.totalAmount,
+            orderPayId,
+            totalAmount,
             isAlreadyCreateOrder: 1
           },
           mode: 'replace'
         });
         // googlePay({
         //   payEnv: 3,
-        //   payWay: params.payWay,
-        //   orderPayId: params.orderPayId,
-        //   externalProductCode: detail?.externalProductCode,
+        //   payWay,
+        //   orderPayId,
+        //   externalProductCode,
         //   onSuccess: () => {
         //     listenOrRemovePayment(false);
         //     JOJO.loading.close()
@@ -378,24 +395,23 @@ export default (props: IProps) => {
         //     }
         //   }
         // });
-      } else if ([110, 111, 112, 140, 142].includes(Number(innerPayWay))) {
-        console.log(333333);
-
+      } else if ([110, 111, 112, 140, 142].includes(Number(payWay))) {
         // 支付宝
         await aliPay({
           ...params,
           curRoute: '/order/create',
           scanPayMethods: payWays.find((i: any) => [111, 142].includes(i.code))
         } as any);
-        getPayResult();
+        getPayResult({ orderId, orderPayId, orderSource });
         JOJO.loading.close();
       } else {
-        // // 微信
-        // await processWxPayV2({
-        //   ...params
-        // } as any);
-        // getPayResult();
-        // JOJO.loading.close()
+        // 微信
+        await wxPay({
+          ...params,
+          curRoute: '/order/create'
+        } as any);
+        getPayResult({ orderId, orderPayId, orderSource });
+        JOJO.loading.close();
       }
     } catch (error) {
       console.error(error);
@@ -404,22 +420,29 @@ export default (props: IProps) => {
   };
 
   // 支付弹窗只有原生支付
-  const showPayModel = (data: ScanPayDataProps) => {
-    console.log(1111, data);
+  // const showPayModel = (data: ScanPayDataProps) => {
+  //   console.log(1111, data);
 
-    pollingCountRef.current = 0;
-    getPayResult(false);
-  };
+  //   pollingCountRef.current = 0;
+  //   getPayResult(false);
+  // };
 
   /**
    * 获取支付结果
    */
-  const getPayResult = async (showPayResultCheck = true) => {
+  const getPayResult = async (params: {
+    showPayResultCheck?: boolean;
+    orderId: string;
+    orderPayId: string;
+    orderSource: string;
+  }) => {
+    const { showPayResultCheck = true, orderId, orderPayId, orderSource } = params;
+
     canLeave.current = true;
     let res = null;
     try {
       res = await getPaiedBillInfo({
-        orderPayId: orderPayIdRef.current
+        orderPayId
       } as any);
     } catch (error) {
       console.error(error);
@@ -443,7 +466,7 @@ export default (props: IProps) => {
       setTimeout(() => {
         toPayAfter({
           data,
-          orderId: query?.orderId || orderIdRef.current,
+          orderId,
           shizi_url,
           platformOrderSource: orderSource
         } as any);
@@ -474,14 +497,13 @@ export default (props: IProps) => {
     pollingCountRef.current += 1;
 
     timerRef.current = setTimeout(() => {
-      getPayResult(showPayResultCheck);
+      getPayResult({ ...params });
     }, 2000);
   };
 
   return {
     _createOrder,
     getPayResult,
-    toPay,
-    priceComparisonInfo
+    toPay
   };
 };

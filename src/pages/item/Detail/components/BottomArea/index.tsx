@@ -69,7 +69,7 @@ const BottomArea: React.FC<Props> = (props) => {
             className={S.supportWrap}
             onClick={() => {
               //   sensClick(e);
-              JOJO.showPage(supportURL, { to: 'externalWeb' });
+              JOJO.navigate(supportURL, { to: 'externalWeb' });
             }}>
             <div className={S.supportImg} />
             <div className={S.supportDesc}>客服</div>

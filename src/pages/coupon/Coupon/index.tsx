@@ -109,7 +109,7 @@ export default function Coupon() {
 
   const onRuleClick = () => {
     // 我想要跳转到活动规则页面
-    JOJO.showPage(`/coupon/rules?${qs.stringify({ activityId })}`);
+    JOJO.navigate(`/coupon/rules?${qs.stringify({ activityId })}`);
   };
 
   // 小升初环境拦截弹窗

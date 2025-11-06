@@ -133,7 +133,7 @@ export const preCheck = (params: {
   payAmount: number;
   skuId: string;
   payMode: string;
-  orderSourceCode: number;
+  orderSourceCode: string;
   action: 'CHEAP' | 'MALL_BOOM_CAN_BIND_INVITE';
 }) => {
   return JOJO.request(params, {
@@ -142,10 +142,8 @@ export const preCheck = (params: {
     method: 'POST'
   });
 };
-/**
- * 创建订单
- */
-export const createOrder = async (params: {
+
+export interface CreateOrderParams {
   linkCode: string; // 商品链接码
   skuId: string; // 商品skuId
   totalAmount: number; // 订单总金额
@@ -153,17 +151,20 @@ export const createOrder = async (params: {
   userCouponIdList: string[]; // 优惠券id
   quantity: number; // 购买数量
   orderSource: string; // 订单来源
-  outToken: string; // 订单token
   orderChannel: string; // 老渠道参数
   channelNo: string; // 渠道码
   skuPrice: number; // 商品价格
   payMode: 'CASH' | 'POINT'; // 支付方式
   externalProductCode: string; // 海外版本：外部编码
-  recommendSkuId: string; // 扩科商品id
+  recommendSkuId: string | undefined; // 扩科商品id
   voucherIds: string[]; // 代金券
   giftPools: string; // M选N
   orderType: 'LEARNING_PAY' | 'NORMAL'; // 订单类型
-}) => {
+}
+/**
+ * 创建订单
+ */
+export const createOrder = async (params: CreateOrderParams) => {
   const traceCode = getCacheTraceCode();
   const platformtId = await getPlatformId();
   const platformType = await getPlatformType();

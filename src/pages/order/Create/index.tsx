@@ -8,18 +8,21 @@ import {
   getUserPurchaseProtocoLink,
   getUserServiceProtocoLink
 } from '@/modules/protocols';
+import ValidatePricePop from '@/pages/item/Detail/components/ValidatePricePop';
 import { getVoucherList } from '@/services/api/coupon';
 import { getProductDetail, getUserAddress } from '@/services/api/order';
 import { getPayMethods } from '@/services/api/orderPay';
 import { getRecommendSkus } from '@/services/api/product';
-import { getAppEnum, getEnvEnum } from '@/services/common';
+import { getEnvEnum } from '@/services/common';
 import { FROUNT_URL_OLD } from '@/services/config';
 
 import Address from './components/Address';
+import Agreement from './components/Agreement';
 import AgreementPop from './components/AgreementPop';
 import BottomArea from './components/BottomArea';
 import PayAfterProtocolPop from './components/PayAfterProtocolPop';
 import PayMethods from './components/PayMethods';
+import PayMethodsPop from './components/PayMethodsPop';
 import Price from './components/Price';
 import RecommendSku from './components/RecommendSku';
 import Skeleton from './components/Skeleton';
@@ -27,6 +30,7 @@ import SkuDetail from './components/SkuDetail';
 import Title from './components/Title';
 import usePromotionPay from './hooks/usePromotionPay';
 import S from './index.module.less';
+import type { CreateOrderProps } from './type';
 import { formatUserCouponIdList, jumpToSubscribePay, needJumpToMiniPay } from './utils';
 
 export default function CreateOrder() {
@@ -42,8 +46,18 @@ export default function CreateOrder() {
   const channelNo = searchParams.get('channelNo') || ''; // 渠道号（新）
   const orderChannel = searchParams.get('orderChannel') || ''; // 渠道参数（旧）
   const orderSource = searchParams.get('orderSource') || ''; // 订单来源
+  const shizi_url = searchParams.get('shizi_url') || ''; // 支付完成回跳url（老参数，保留）
+  // const payMode = searchParams.get('payMode') || ''; // 支付方式（学豆 | 钱）
   // 内部参数
   const voucherIds = searchParams.get('voucherIds') || ''; // 订阅类型
+  const isAlreadyCreateOrder = searchParams.get('isAlreadyCreateOrder') || ''; // 是否已创建订单
+  const totalAmount = searchParams.get('totalAmount') || ''; // 订单金额
+  const orderId = searchParams.get('orderId') || ''; // 订单id
+  const payWay = searchParams.get('payWay') || ''; // 支付方式
+  const orderPayId = searchParams.get('orderPayId') || ''; // 订单支付id
+  const externalProductCode = searchParams.get('externalProductCode') || ''; // 外部商品编码
+  const from = searchParams.get('from') || ''; // 页面来源，用于判断 微信环境中，点击支付宝支付 在浏览器打开当前链接的情况
+
   const curVoucherIds = voucherIds ? voucherIds.split(',') : [];
 
   // 商品详情
@@ -82,18 +96,22 @@ export default function CreateOrder() {
   const [curPayWay, setCurPayWay] = useState(0);
   // 是否有优惠券
   const [haveCoupon, setHaveCoupon] = useState(false);
+  // 价格对比信息
+  const [priceComparisonInfo, setPriceComparisonInfo] = useState<any>({});
+  // 活动变更提示信息
+  const [activityChangeInfo, setActivityChangeInfo] = useState<any>({});
 
   // 协议弹窗
   const [agreementVisible, setAgreementVisible] = useState(false);
   // 先学后付协议弹窗
   const [payAfterProtocolVisible, setPayAfterProtocolVisible] = useState(false);
-
+  // 价格对比弹窗
+  const [validatePricePopVisible, setValidatePricePopVisible] = useState(false);
+  // 活动变更提示弹窗
+  const [activityChangeVisible, setActivityChangeVisible] = useState(false);
   // 未检测到支付结果弹窗
   // const [payResultVisible, setPayResultVisible] = useState(false);
-  // 价格对比弹窗
-  // const [validatePricePopVisible, setValidatePricePopVisible] = useState(false);
-  // // 活动变更提示弹窗
-  // const [activityChangeVisible, setActivityChangeVisible] = useState(false);
+
   // const [activityChangeContent, setActivityChangeContent] = useState('');
   // 支付确认loading
   // const [payComfirmloading, setPayComfirmLoading] = useState(false);
@@ -113,16 +131,14 @@ export default function CreateOrder() {
     'voucherIds'
   );
 
-  const { _createOrder } = usePromotionPay({
-    query: JOJO.Utils.getQuery(),
-    // query: {},
+  const { _createOrder, toPay, getPayResult } = usePromotionPay({
+    // query: JOJO.Utils.getQuery(),
+    shizi_url,
     address,
-    detail,
     payWays,
-    curPayWay,
     canLeave
     // setPayResultVisible,
-    // setValidatePricePopVisible,s
+    // setValidatePricePopVisible,
     // setTipVisible,
     // setActivityChangeVisible,
     // setActivityChangeContent,
@@ -136,6 +152,30 @@ export default function CreateOrder() {
   useEffect(() => {
     initPage();
   }, []);
+
+  useEffect(() => {
+    if (!JOJO.Os.app && !JOJO.Os.wechatBrowser && from === 'alipay_in_wx') {
+      // 已创建订单，待支付，直接取链接上的参数
+      toPay({ orderId, payWay, orderPayId, orderSource, externalProductCode });
+    }
+  }, []);
+
+  // 协议弹窗关闭：同意后自动提交订单
+  useEffect(() => {
+    if (!agreementVisible && isAcceptProtocol) {
+      if (isAlreadyCreateOrder === '1') {
+        toPay({
+          orderId,
+          payWay,
+          orderPayId,
+          orderSource,
+          externalProductCode
+        });
+      } else {
+        handleConfirm();
+      }
+    }
+  }, [agreementVisible]);
   /**
    * 跳转选择地址
    */
@@ -145,7 +185,7 @@ export default function CreateOrder() {
     //   $element_name: '商城订单确认页_地址点击'
     // });
     if (id) {
-      JOJO.showPage(`${FROUNT_URL_OLD}/address/list`, {
+      JOJO.navigate(`${FROUNT_URL_OLD}/address/list`, {
         params: {
           type: 'order',
           redirect_url: window.location.href
@@ -153,7 +193,7 @@ export default function CreateOrder() {
         to: 'externalWeb'
       });
     } else {
-      JOJO.showPage(`${FROUNT_URL_OLD}/address/edit`, {
+      JOJO.navigate(`${FROUNT_URL_OLD}/address/edit`, {
         to: 'externalWeb',
         params: {
           type: 'order',
@@ -211,7 +251,7 @@ export default function CreateOrder() {
         curVoucherIdsRef.current = data?.items?.[0]?.optimalChoices?.optimalChoices?.map(
           (item: any) => item?.assetsId
         );
-        JOJO.showPage('/order/create', {
+        JOJO.navigate('/order/create', {
           params: {
             ...JOJO.Utils.getQuery(window.location.search),
             voucherIds: decodeURIComponent(
@@ -357,7 +397,7 @@ export default function CreateOrder() {
           content: errorMsg,
           icon: 'info'
         });
-        JOJO.showPage('/order/create', {
+        JOJO.navigate('/order/create', {
           params: {
             ...JOJO.Utils.getQuery(window.location.search),
             voucherIds: ''
@@ -443,7 +483,7 @@ export default function CreateOrder() {
     }
     canLeave.current = true;
     // TODO：这里跳转过去之后无法跳转回来，需修改代金券选择页回跳逻辑
-    JOJO.showPage(`${FROUNT_URL_OLD}/coupon/voucherSelect`, {
+    JOJO.navigate(`${FROUNT_URL_OLD}/coupon/voucherSelect`, {
       params: {
         ...JOJO.Utils.getQuery(window.location.search),
         rediectRouter: '/order/create',
@@ -466,7 +506,7 @@ export default function CreateOrder() {
     // sensClickInitiative({
     //   $element_name: '商城订单确认页_优惠券点击'
     // });
-    JOJO.showPage(`${FROUNT_URL_OLD}/coupon/use`, {
+    JOJO.navigate(`${FROUNT_URL_OLD}/coupon/use`, {
       params: {
         ...(qs.parse(window.location.search) || {}),
         _ppl: detail.productLinkId,
@@ -518,6 +558,24 @@ export default function CreateOrder() {
   };
 
   /**
+   * 显示价格对比弹窗
+   * @param val
+   */
+  const onShowValidatePricePop = (val: any) => {
+    setValidatePricePopVisible(true);
+    setPriceComparisonInfo(val);
+  };
+
+  /**
+   * 显示活动变更弹窗
+   * @param val
+   */
+  const onShowActivityChangePop = (val: any) => {
+    setActivityChangeVisible(true);
+    setActivityChangeInfo(val);
+  };
+
+  /**
    * 页面触发下单操作: 前置判断
    */
   const handleConfirm = async () => {
@@ -528,16 +586,16 @@ export default function CreateOrder() {
     // }
 
     // 目前商城链路未支持IAP支付，对纯虚拟商品做兜底处理，阻止下单操作
-    const iosApp = await JOJO.Utils.isIosApp();
-    if (iosApp && currencyType !== 'USD') {
-      if (detail?.shipmentType === 1 && detail?.totalCast > 0) {
-        JOJO.toast.show({
-          content: '该商品暂时无法购买，请联系客服',
-          icon: 'info'
-        });
-        return;
-      }
-    }
+    // const iosApp = await JOJO.Utils.isIosApp();
+    // if (iosApp && currencyType !== 'USD') {
+    //   if (detail?.shipmentType === 1 && detail?.totalCast > 0) {
+    //     JOJO.toast.show({
+    //       content: '该商品暂时无法购买，请联系客服',
+    //       icon: 'info'
+    //     });
+    //     return;
+    //   }
+    // }
 
     if (!skuId) {
       JOJO.toast.show({
@@ -601,31 +659,27 @@ export default function CreateOrder() {
 
     canLeave.current = true;
 
-    // 获取包名枚举
-    const app = await getAppEnum();
-
-    const params = {
+    const params: CreateOrderProps = {
       linkCode,
       quantity: 1, // 暂时解决因购物车数量可更改导致下单数量为多个
       skuId,
       userAddressId: needAddress ? address?.id : '',
       totalAmount: detail.totalCast, // 仅用于学豆余额校验，活动sku已在加载时做了替换
       userCouponIdList: formatUserCouponIdList(cpId, useUserCouponIds),
-      // outToken,
       orderSource,
       subscriptionType,
       orderChannel,
       channelNo,
       skuPrice: detail.skuSaleResp ? detail.skuSaleResp.skuPrice : '',
-      skuSubsectionModeId: detail.skuSubSectionModeId,
-      skuSubSectionModeDetailId: detail.skuSubSectionModeDetailId,
       payMode: 'CASH',
       externalProductCode: detail.externalProductCode,
-      app,
       recommendSkuId,
       giftPools: JSON.parse(decodeURIComponent(giftPools || '') || '[]'),
       orderType: Number(curPayWay) === 999 ? 'LEARNING_PAY' : 'NORMAL',
-      voucherIds: curVoucherIdsRef.current || []
+      voucherIds: curVoucherIdsRef.current || [],
+      payWay: Number(curPayWay),
+      onShowValidatePricePop,
+      onShowActivityChangePop
     };
 
     if (subscriptionType) {
@@ -694,6 +748,39 @@ export default function CreateOrder() {
           </>
         ) : null}
       </div>
+      {/* 支付方式弹窗 */}
+      {isAlreadyCreateOrder === '1' && detail?.totalCast > 0 ? (
+        <PayMethodsPop
+          subscriptionType={subscriptionType}
+          // onHandleSubscribeWay={onSubscriptionPay}
+          payWays={payWays}
+          detail={detail}
+          onHandlePayWay={(val) => {
+            if (!isAcceptProtocol) {
+              setAgreementVisible(true);
+              return;
+            }
+            // 已创建订单，待支付，直接取链接上的参数
+            toPay?.({
+              payWay: val,
+              totalAmount,
+              orderId,
+              orderSource,
+              orderPayId,
+              externalProductCode: detail?.externalProductCode
+            });
+          }}
+          price={detail?.totalCast}
+          renderAgreement={() => (
+            <Agreement
+              subscriptionType={subscriptionType}
+              isAcceptProtocol={isAcceptProtocol}
+              onProtocolChange={(val) => setIsAcceptProtocol(val)}
+              onHandleGoProtocol={toProtocol}
+            />
+          )}
+        />
+      ) : null}
       <div className={S.safeArea} />
       {/* 按钮 & 协议 */}
       <BottomArea
@@ -725,6 +812,12 @@ export default function CreateOrder() {
           isAcceptPayAfterProtocolRef.current = true;
           setPayAfterProtocolVisible(false);
         }}
+      />
+      {/* 价格比对弹窗 */}
+      <ValidatePricePop
+        visible={validatePricePopVisible}
+        info={priceComparisonInfo}
+        onClose={() => setValidatePricePopVisible(false)}
       />
     </div>
   );

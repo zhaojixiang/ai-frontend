@@ -10,7 +10,7 @@ import wx from 'weixin-js-sdk';
 import Os from '@/lib/os';
 import router from '@/routes';
 
-export interface ShowPageConfig {
+export interface NavigatorConfig {
   // 跳转目标环境：mini（小程序）、externalWeb（外部H5）、flutter（Flutter页面）、native（原生页面）
   to?: 'mini' | 'externalWeb' | 'flutter' | 'native';
   // 跳转方式：navigate（跳转）、replace（替换），to === flutter | native 时，mode 无效
@@ -50,9 +50,9 @@ const mergeUrlAndParams = (url: string, params: Record<string, any>) => {
   return finalUrl;
 };
 
-const showPage = (
+const navigate = (
   url: string,
-  { to, mode = 'navigate', params = {}, onNavigateToMiniComplete }: ShowPageConfig = {}
+  { to, mode = 'navigate', params = {}, onNavigateToMiniComplete }: NavigatorConfig = {}
 ) => {
   switch (to) {
     case 'mini':
@@ -101,4 +101,4 @@ const showPage = (
   }
 };
 
-export default showPage;
+export default navigate;

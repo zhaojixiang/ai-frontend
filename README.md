@@ -75,13 +75,13 @@ export default () => {
 import React from 'react';
 
 // 在顶层使用需手动导入
-import { Os, request, showPage, Utils } from '@/lib/jojo';
+import { Os, request, navigate, Utils } from '@/lib/jojo';
 
-console.log(Os, request, showPage, Utils);
+console.log(Os, request, navigate, Utils);
 
 export default () => {
   // 在函数内部依然使用JOJO全局变量
-  console.log(JOJO.Os.jojoup, JOJO.request, JOJO.showPage, JOJO.Utils);
+  console.log(JOJO.Os.jojoup, JOJO.request, JOJO.navigate, JOJO.Utils);
 
   return <div>JOJO</div>;
 };
@@ -103,12 +103,12 @@ Utils 对象中存储了一些工具函数，详细信息请看 `@lib/utils/inde
 JOJO.Utils.getQueryString(); // 获取url参数
 ```
 
-### showPage
+### navigate
 
-showPage 函数用于跳转到指定的页面，详细信息请看 `@lib/showPage/index.ts`
+navigate 函数用于跳转到指定的页面，详细信息请看 `@lib/navigate/index.ts`
 
 ```js
-JOJO.showPage('/home/index');
+JOJO.navigate('/home/index');
 ```
 
 ### request
@@ -149,7 +149,7 @@ JOJO.toast.close();
 ### popup
 
 ```js
-JOJO.popup.show(<div>1111</div>, {
+JOJO.popup(<div>1111</div>, {
   bodyStyle: {}
 });
 ```

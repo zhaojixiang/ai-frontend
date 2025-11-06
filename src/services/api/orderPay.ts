@@ -21,6 +21,16 @@ export const billCheckOutByToken = (params: any) => {
   });
 };
 /**
+ * 微信：获取支付参数
+ */
+export const billCheckOut = (params: any) => {
+  return JOJO.request(params, {
+    baseURL: serviceUrl.orderpay,
+    url: `/api/fe/pay/bill-check-out`,
+    method: 'POST'
+  });
+};
+/**
  * 获取地址
  */
 export const getPayMethods = (params: {

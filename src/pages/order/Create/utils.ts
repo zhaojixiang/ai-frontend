@@ -33,7 +33,7 @@ export const needJumpToMiniPay = async (params: { subscriptionType: string }) =>
 export const jumpToSubscribePay = async (params: any) => {
   const needJumpToMini = await needJumpToMiniPay(params);
   if (needJumpToMini) {
-    JOJO.showPage('/pages/pkgs/mall/pages/subscribe_pay/main', {
+    JOJO.navigate('/pages/pkgs/mall/pages/subscribe_pay/main', {
       params,
       to: 'mini'
     });
@@ -62,7 +62,7 @@ export const toPayAfter = async ({ data, orderId, shizi_url, platformOrderSource
     const res = await getUserAddress();
     // 需要发货且发货地址后置
     if (res?.data?.length) {
-      JOJO.showPage('/address/list', {
+      JOJO.navigate('/address/list', {
         params: {
           type: 'addressDelayAddFromList',
           orderId,
@@ -73,7 +73,7 @@ export const toPayAfter = async ({ data, orderId, shizi_url, platformOrderSource
         mode: 'replace'
       });
     } else {
-      JOJO.showPage('/address/edit', {
+      JOJO.navigate('/address/edit', {
         params: {
           type: 'addressDelayAdd',
           orderId,
@@ -94,7 +94,7 @@ export const toPayAfter = async ({ data, orderId, shizi_url, platformOrderSource
     const newQuery = { ...query, payStatus: 'success', mallOrderNo: orderId };
     const location = payAfterUrl?.split('?')[0];
     const url = /\?$/g.test(location) ? location : `${location}?`;
-    JOJO.showPage(url, {
+    JOJO.navigate(url, {
       params: newQuery,
       to: 'externalWeb',
       mode: 'replace'
@@ -104,7 +104,7 @@ export const toPayAfter = async ({ data, orderId, shizi_url, platformOrderSource
 
   // 自动激活
   if (autoActive) {
-    JOJO.showPage(`${JOIN_CLASS_URL}`, {
+    JOJO.navigate(`${JOIN_CLASS_URL}`, {
       to: 'externalWeb',
       mode: 'replace',
       params: {
@@ -117,7 +117,7 @@ export const toPayAfter = async ({ data, orderId, shizi_url, platformOrderSource
   }
   // 来源：绘本app
   if (data.orderSource === '304') {
-    JOJO.showPage('/order/success', {
+    JOJO.navigate('/order/success', {
       params: {
         orderId,
         ss: 'false',
@@ -130,7 +130,7 @@ export const toPayAfter = async ({ data, orderId, shizi_url, platformOrderSource
   }
   // 有优惠券
   if (data.haveCoupon) {
-    JOJO.showPage(`/order/coupon/success?ss=${!!selfSupporting}`, {
+    JOJO.navigate(`/order/coupon/success?ss=${!!selfSupporting}`, {
       to: 'externalWeb',
       mode: 'replace'
     });
@@ -138,7 +138,7 @@ export const toPayAfter = async ({ data, orderId, shizi_url, platformOrderSource
   }
   // 没有课程
   if (!data.hasCourse) {
-    JOJO.showPage('/order/success', {
+    JOJO.navigate('/order/success', {
       params: {
         orderId,
         ss: 'false',
@@ -150,7 +150,7 @@ export const toPayAfter = async ({ data, orderId, shizi_url, platformOrderSource
     return;
   }
 
-  JOJO.showPage(`${JOIN_CLASS_URL}`, {
+  JOJO.navigate(`${JOIN_CLASS_URL}`, {
     to: 'externalWeb',
     mode: 'replace',
     params: {

@@ -81,7 +81,7 @@ export default (props: IProps) => {
               : detail.productTitle}
           </div>
           {detail?.gradeLevelGuide ? (
-            <div className={S.grate}>适用于{detail?.gradeLevelGuide}</div>
+            <div className={S.grate}>推荐{detail?.gradeLevelGuide}</div>
           ) : null}
         </div>
       </div>

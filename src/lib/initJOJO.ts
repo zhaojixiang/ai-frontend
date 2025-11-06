@@ -6,11 +6,11 @@ export const initJOJO = async () => {
   if (!window.JOJO) window.JOJO = { Os: {} };
 
   // 异步加载模块
-  const [os, utils, request, showPage, loading, toast, bridge, popup] = await Promise.all([
+  const [os, utils, request, navigate, loading, toast, bridge, popup] = await Promise.all([
     import('./os'),
     import('./utils/index'),
     import('./request').catch(() => null),
-    import('./showPage').catch(() => null),
+    import('./navigate').catch(() => null),
     import('./loading').catch(() => null),
     import('./toast').catch(() => null),
     import('./bridge').catch(() => null),
@@ -21,7 +21,7 @@ export const initJOJO = async () => {
     Os: { ...window.JOJO.Os, ...os.default },
     Utils: utils?.default,
     request: request?.default,
-    showPage: showPage?.default,
+    navigate: navigate?.default,
     loading: loading?.default,
     toast: toast?.default,
     bridge: bridge?.default,

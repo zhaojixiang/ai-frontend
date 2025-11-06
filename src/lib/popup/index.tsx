@@ -1,7 +1,9 @@
 import type { CenterPopupProps } from 'antd-mobile';
-import { CenterPopup } from 'antd-mobile';
+import { Button, CenterPopup } from 'antd-mobile';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
+
+import S from './index.module.less';
 
 type FullScreenPopupOptions = CenterPopupProps & {
   animate?: boolean; // 是否需要动画（默认 true）
@@ -80,3 +82,75 @@ export default function showPopup(content: React.ReactNode, options?: FullScreen
 
   return { destroy: () => destroyFn?.() };
 }
+
+// 添加 confirm 方法
+showPopup.confirm = function (options: {
+  title?: string;
+  content: React.ReactNode;
+  cancelText?: string;
+  confirmText?: string;
+  onCancel?: () => void;
+  onConfirm?: () => void;
+}) {
+  const {
+    title,
+    content,
+    cancelText = '取消',
+    confirmText = '确定',
+    onCancel,
+    onConfirm
+  } = options;
+
+  const div = document.createElement('div');
+  document.body.appendChild(div);
+  const root = ReactDOM.createRoot(div);
+
+  let destroyFn: () => void;
+
+  const ConfirmWrapper = () => {
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+      requestAnimationFrame(() => setVisible(true));
+    }, []);
+
+    destroyFn = () => {
+      setVisible(false);
+      setTimeout(() => {
+        root.unmount();
+        div.remove();
+      }, 300);
+    };
+
+    const handleCancel = () => {
+      onCancel?.();
+      destroyFn();
+    };
+
+    const handleConfirm = () => {
+      onConfirm?.();
+      destroyFn();
+    };
+
+    return (
+      <CenterPopup visible={visible} onClose={destroyFn} onMaskClick={handleCancel}>
+        <div className={S.confirmPop}>
+          {title && <div className={S.title}>{title}</div>}
+          <div className={S.content}>{content}</div>
+          <div className={S.btnGroup}>
+            <Button size='large' fill='none' className={S.cancelBtn} onClick={handleCancel}>
+              {cancelText}
+            </Button>
+            <Button size='large' color='primary' className={S.confirmBtn} onClick={handleConfirm}>
+              {confirmText}
+            </Button>
+          </div>
+        </div>
+      </CenterPopup>
+    );
+  };
+
+  root.render(<ConfirmWrapper />);
+
+  return { destroy: () => destroyFn?.() };
+};

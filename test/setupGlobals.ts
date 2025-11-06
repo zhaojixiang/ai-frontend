@@ -55,7 +55,7 @@ global.JOJO = {
     }
   },
   request: jest.fn(),
-  showPage: jest.fn(),
+  navigate: jest.fn(),
   toast: {
     show: jest.fn(),
     error: jest.fn(),

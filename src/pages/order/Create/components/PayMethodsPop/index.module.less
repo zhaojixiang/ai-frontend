@@ -1,0 +1,89 @@
+.payMethodsWrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 888;
+  display: flex;
+  align-items: flex-end;
+  background-color: rgba(0, 0, 0, 0.5);
+  * {
+    box-sizing: border-box;
+  }
+  .content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 24px 24px 0 0;
+    height: 92%;
+    width: 100%;
+    position: relative;
+    .close {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-size: 18px;
+    }
+    .title {
+      color: #404040;
+      font-weight: 500;
+      text-align: center;
+      font-size: 18px;
+      padding: 50px 0 10px;
+    }
+    .amount {
+      color: #ff715c;
+      font-size: 24px;
+      text-align: center;
+      font-weight: 500;
+      padding: 5px 0 30px;
+    }
+    .itemWrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      .itemBox {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 11px 5px;
+        text-align: center;
+        width: 160px;
+        height: 130px;
+        border-radius: 12px;
+        border: 1px solid #e9ecf0;
+        background: #fff;
+        margin-bottom: 16px;
+        .labelIcon {
+          width: 48px;
+          height: 48px;
+          margin-bottom: 10px;
+          background: no-repeat center/contain;
+          &.alipayIcon {
+            background-image: url('@/assets/images/alipay.png');
+          }
+          &.wxpayIcon {
+            background-image: url('@/assets/images/wxpay.png');
+          }
+          &.aliscanIcon {
+            background-image: url('@/assets/images/aliscan.png');
+          }
+          &.payAfterIcon {
+            background-image: url('@/assets/images/payafter.png');
+          }
+          &.appleIcon {
+            background-image: url('@/assets/images/apple_Pay.png');
+          }
+          &.googleIcon {
+            background-image: url('@/assets/images/google_pay.png');
+          }
+        }
+      }
+    }
+    .agreement {
+      margin-top: 10px;
+    }
+  }
+}

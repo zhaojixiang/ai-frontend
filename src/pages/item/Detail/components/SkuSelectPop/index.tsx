@@ -333,7 +333,7 @@ export default function SkuSelectPop(props: IProps) {
             <div className={S.titleWrap}>
               <div className={S.productTitle}>{skuDetail?.skuName || productTitle}</div>
               {skuDetail?.gradeLevelGuide ? (
-                <div className={S.productTag}>适用于{skuDetail?.gradeLevelGuide}</div>
+                <div className={S.productTag}>推荐{skuDetail?.gradeLevelGuide}</div>
               ) : null}
             </div>
           </div>

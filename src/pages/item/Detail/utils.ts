@@ -270,15 +270,16 @@ export const checkOrder = async (properties: any, callbacks: any) => {
   }
 
   // 国内IOS APP中，纯虚拟商品下单拦截
-  const iosApp = await isIosApp();
-  if (iosApp && currencyType !== 'USD') {
-    if (!skuDetail?.needShip) {
-      JOJO.toast.show({
-        content: '该商品暂时无法购买，请联系客服'
-      });
-      return false;
-    }
-  }
+  // TODO
+  // const iosApp = await isIosApp();
+  // if (iosApp && currencyType !== 'USD') {
+  //   if (!skuDetail?.needShip) {
+  //     JOJO.toast.show({
+  //       content: '该商品暂时无法购买，请联系客服'
+  //     });
+  //     return false;
+  //   }
+  // }
 
   // 构造参数
   const skuId = skuDetail.id;

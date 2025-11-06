@@ -10,7 +10,7 @@ export default (props: { visible: boolean; onClose: () => void }) => {
    * 点击前往叫叫APP
    */
   const handleConfirm = () => {
-    JOJO.showPage(
+    JOJO.navigate(
       'https://jojoread.tinman.cn/account/appDownload/?packageName=com.shusheng.JoJoRead&channel=Tinman',
       { to: 'externalWeb' }
     );

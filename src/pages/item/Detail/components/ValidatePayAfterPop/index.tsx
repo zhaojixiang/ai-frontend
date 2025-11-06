@@ -19,7 +19,7 @@ export default (props: Props) => {
    */
   const handleClick = async () => {
     onClose();
-    JOJO.showPage(
+    JOJO.navigate(
       `${FROUNT_URL_OLD}/order/detail?${qs.stringify({
         orderId: info?.orderId
       })}`,

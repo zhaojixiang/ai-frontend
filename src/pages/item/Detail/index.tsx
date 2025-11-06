@@ -232,7 +232,7 @@ export default function Detail() {
     if (!newQuery.productId) {
       newQuery.productId = String(pageData.id);
     }
-    JOJO.showPage(`${FROUNT_URL_OLD}/item/share?${qs.stringify(newQuery)}`, { to: 'externalWeb' });
+    JOJO.navigate(`${FROUNT_URL_OLD}/item/share?${qs.stringify(newQuery)}`, { to: 'externalWeb' });
   };
 
   /**
@@ -378,7 +378,7 @@ export default function Detail() {
     }
     console.log('urlParams', qs.stringify(urlParams));
 
-    JOJO.showPage(`/order/create?${qs.stringify(urlParams)}`);
+    JOJO.navigate(`/order/create?${qs.stringify(urlParams)}`);
   };
 
   /**
