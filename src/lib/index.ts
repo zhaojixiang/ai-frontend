@@ -1,7 +1,6 @@
 /**
- * 用于需要在顶层使用JOJO全局变量时，获取不到JOJO的值，需手动引入
+ * 用于需要在顶层使用JJ全局变量时，获取不到JJ的值，需手动引入
  */
-export { default as bridge } from './bridge';
 export { default as navigate } from './navigate';
 export { default as Os } from './os';
 export { default as request } from './request';

@@ -2,27 +2,8 @@ import legacy from '@vitejs/plugin-legacy';
 import path from 'path';
 import pxtovw from 'postcss-px-to-viewport';
 import type { ConfigEnv, UserConfig } from 'vite';
-import { loadEnv } from 'vite';
 import { defineConfig } from 'vite';
 import eslint from 'vite-plugin-eslint';
-
-//  html环境变量注入 将env环境变量注入到html中，替换掉window.env
-const htmlPlugin = () => {
-  // 获取非vite前缀的环境变量
-  const env = loadEnv(process.env.NODE_ENV || 'production', process.cwd(), '');
-  return {
-    name: 'html-transform',
-    transformIndexHtml(html: string) {
-      // 在根节点后面，替换 hmtl 上的window替换掉
-      return html.replace(
-        /<div id="root">\s*<span class="loading-spinner"><\/span>\s*<\/div>/,
-        `<div id="root"><span class="loading-spinner"></span></div><script id="env">window.process = {env:${JSON.stringify(
-          env
-        )}};</script>`
-      );
-    }
-  };
-};
 
 // https://vite.dev/config/
 export default defineConfig(({ command }: ConfigEnv): UserConfig => {
@@ -55,8 +36,7 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
           'ie >= 11'
         ],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime']
-      }),
-      htmlPlugin()
+      })
     ],
     resolve: {
       alias: {
@@ -93,10 +73,7 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
     },
 
     build: {
-      sourcemap:
-        process.env?.ENV_NAME === 'fat' ||
-        process.env?.ENV_NAME === 'dev' ||
-        process.env?.ENV_NAME === 'uat',
+      sourcemap: process.env?.ENV_NAME === 'test',
       target: 'es2015',
       minify: 'terser',
       chunkSizeWarningLimit: 500,
@@ -111,8 +88,7 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
         output: {
           manualChunks: {
             react: ['react', 'react-dom'],
-            antdMobile: ['antd-mobile'],
-            sentry: ['@woulsl/sentry-config']
+            antdMobile: ['antd-mobile']
           }
         }
       }
@@ -146,9 +122,16 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
 
   // 构建之后生效
   if (command === 'build') {
+    Object.keys(process.env).forEach((item) => {
+      // 注入外部变量
+      const whiteKeys = ['ENV_NAME'];
+      if (whiteKeys.includes(item)) {
+        process.env[`VITE_${item}`] = process.env[item];
+      }
+    });
     config = {
       ...config,
-      base: process.env.ALL_CDN_DOMAIN_AND_PREFIX_MD5_HASH,
+      base: '/',
       define: {
         'process.env.NODE_ENV': '"production"'
       }

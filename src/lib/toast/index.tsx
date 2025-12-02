@@ -8,7 +8,7 @@ class ToastWrapper {
 
   show(options: ToastShowProps) {
     if (options.icon === 'loading') {
-      console.error('loading: 请使用JOJO.loading.show() 替换 JOJO.toast.show()');
+      console.error('loading: 请使用JJ.loading.show() 替换 JJ.toast.show()');
       return;
     }
     // 如果有未关闭的 toast，先关闭

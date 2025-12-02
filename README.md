@@ -6,7 +6,6 @@
 
 ```
 ENV_NAME=dev | fat
-APP_NAME=jojo | jojoup | matrix
 ```
 
 # 编码
@@ -25,8 +24,6 @@ envs // 本地开发环境变量配置
 src/
 ├── assets/                  // 静态资源
 │   ├── images/              // 图片资源
-│		│   ├── jojo/            // jojo图片资源
-│		│   └── jojoup/          // jojoup图片资源
 ├── style/                   // 全局样式
 │   └── global.less          // 全局样式
 ├── components/              // 通用组件
@@ -50,40 +47,40 @@ src/
 └── vite-env.d.ts            // Vite环境ts定义
 ```
 
-## 全局对象 JOJO
+## 全局对象 JJ
 
-`JOJO` 对象中存储了一些全局变量
+`JJ` 对象中存储了一些全局变量
 
-注意：由于vite在开发阶段会使用ESM对代码进行静态解析，因此在顶层代码使用`JOJO`时，`JOJO`可能还未完成初始化，因此会获取不到`JOJO`的值，所以请在函数内部使用它。
+注意：由于vite在开发阶段会使用ESM对代码进行静态解析，因此在顶层代码使用`JJ`时，`JJ`可能还未完成初始化，因此会获取不到`JJ`的值，所以请在函数内部使用它。
 
 ```js
 import React from 'react';
 
-// 这里无法获取到JOJO
-console.log(JOJO);
+// 这里无法获取到JJ
+console.log(JJ);
 
 export default () => {
-  // 在函数内部才能获取到JOJO
-  console.log(JOJO);
-  return <div>JOJO</div>;
+  // 在函数内部才能获取到JJ
+  console.log(JJ);
+  return <div>JJ</div>;
 };
 ```
 
-当需要在顶层使用时，请勿直接使用`JOJO`全局对象，应手动导入`JOJO`上挂载的对象，`JOJO`上挂载的对象都会在`@/lib/jojo`中进行导出，效果与直接使用`JOJO`全局对象一致。
+当需要在顶层使用时，请勿直接使用`JJ`全局对象，应手动导入`JJ`上挂载的对象，`JJ`上挂载的对象都会在`@/lib/index.ts`中进行导出，效果与直接使用`JJ`全局对象一致。
 
 ```js
 import React from 'react';
 
 // 在顶层使用需手动导入
-import { Os, request, navigate, Utils } from '@/lib/jojo';
+import { Os, request, navigate, Utils } from '@/lib/index';
 
 console.log(Os, request, navigate, Utils);
 
 export default () => {
-  // 在函数内部依然使用JOJO全局变量
-  console.log(JOJO.Os.jojoup, JOJO.request, JOJO.navigate, JOJO.Utils);
+  // 在函数内部依然使用JJ全局变量
+  console.log(JJ.request, JJ.navigate, JJ.Utils);
 
-  return <div>JOJO</div>;
+  return <div>JJ</div>;
 };
 ```
 
@@ -92,7 +89,12 @@ export default () => {
 Os 对象中存储了一些设备信息，详细信息请看 `@lib/os/index.js`
 
 ```js
-JOJO.OS.jojoup; // 是否是jojoup环境
+JJ.OS.debug; // 是否是调试环境
+JJ.OS.xcx; // 是否是小程序
+JJ.OS.wechat; // 是否是微信环境
+JJ.OS.wechatBrowser; // 是否是微信浏览器
+JJ.OS.ali; // 是否是支付宝
+JJ.OS.dingding; // 是否是钉钉
 ```
 
 ### Utils
@@ -100,7 +102,7 @@ JOJO.OS.jojoup; // 是否是jojoup环境
 Utils 对象中存储了一些工具函数，详细信息请看 `@lib/utils/index.ts`
 
 ```js
-JOJO.Utils.getQueryString(); // 获取url参数
+JJ.Utils.getQueryString(); // 获取url参数
 ```
 
 ### navigate
@@ -108,7 +110,7 @@ JOJO.Utils.getQueryString(); // 获取url参数
 navigate 函数用于跳转到指定的页面，详细信息请看 `@lib/navigate/index.ts`
 
 ```js
-JOJO.navigate('/home/index');
+JJ.navigate('/home/index');
 ```
 
 ### request
@@ -116,7 +118,7 @@ JOJO.navigate('/home/index');
 request 函数用于发送请求，详细信息请看 `@lib/request/index.ts`
 
 ```js
-JOJO.request('/api/test', { method: 'GET' });
+JJ.request('/api/test', { method: 'GET' });
 ```
 
 ### loading
@@ -124,8 +126,8 @@ JOJO.request('/api/test', { method: 'GET' });
 loading 是对 antd-mobile toast 的封装，配置项与 antd-mobile toast 一致，详细信息请看 `@lib/loading/index.ts`
 
 ```js
-JOJO.loading.show({ content: '加载中...' });
-JOJO.loading.close();
+JJ.loading.show({ content: '加载中...' });
+JJ.loading.close();
 ```
 
 ### toast
@@ -133,23 +135,23 @@ JOJO.loading.close();
 toast 是对 antd-mobile toast 的封装，配置项与 antd-mobile toast 一致，详细信息请看 `@lib/toast/index.ts`
 
 ```js
-JOJO.toast.show({ content: '请求中' });
-JOJO.toast.error({ content: '请求失败' });
+JJ.toast.show({ content: '请求中' });
+JJ.toast.error({ content: '请求失败' });
 
-JOJO.toast.success({
+JJ.toast.success({
   content: '请求成功',
   afterClose: () => {
     console.log('toast关闭回调');
   }
 });
 
-JOJO.toast.close();
+JJ.toast.close();
 ```
 
 ### popup
 
 ```js
-JOJO.popup(<div>1111</div>, {
+JJ.popup(<div>1111</div>, {
   bodyStyle: {}
 });
 ```
@@ -157,5 +159,5 @@ JOJO.popup(<div>1111</div>, {
 ### bridge
 
 ```js
-JOJO.bridge.userInfo();
+JJ.bridge.userInfo();
 ```

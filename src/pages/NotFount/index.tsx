@@ -1,4 +1,4 @@
-import Error from '@/assets/images/jojo/rightsProtection/error.png';
+import Error from '@/assets/images/error.svg';
 
 import styles from './index.module.less';
 

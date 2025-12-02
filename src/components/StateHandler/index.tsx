@@ -1,9 +1,7 @@
 import { Button } from 'antd-mobile';
 import { isEmpty } from 'lodash-es';
 
-import ErrorSrcJo from '@/assets/images/jojo/error-others.png';
-import ErrorSrcUp from '@/assets/images/jojoup/error-others.png';
-import { Os } from '@/lib';
+import error from '@/assets/images/error.svg';
 
 import S from './index.module.less';
 
@@ -29,10 +27,8 @@ interface StateHandlerProps {
   retry?: () => void;
   children?: React.ReactNode;
 }
-// 请求失败
-// const FailSrc = Os.jojoup ? ErrorSrcUp : ErrorSrcJo;
 // 接口异常
-const ErrorSrc = Os.jojoup ? ErrorSrcUp : ErrorSrcJo;
+const ErrorSrc = error;
 // 加载中
 
 /**
@@ -40,7 +36,7 @@ const ErrorSrc = Os.jojoup ? ErrorSrcUp : ErrorSrcJo;
  */
 const Abnormal: React.FC<StateHandlerProps> = (props) => {
   const { retry, options } = props;
-  let imageSrc = ErrorSrcJo;
+  let imageSrc = error;
   let errText: string = '哦哦，出错了！';
 
   if (options?.status) {

@@ -26,7 +26,7 @@ declare global {
     (content: React.ReactNode, options?: FullScreenPopupOptions): { destroy: () => void };
     confirm: (options: PopupConfirmOptions) => { destroy: () => void };
   };
-  interface JOJOTYPE {
+  interface JJTYPE {
     Os: OS;
     loading: LoadingType;
     Utils: Utils;
@@ -37,11 +37,11 @@ declare global {
     popup: PopupType;
   }
   /**
-   * jojo
+   * JJ
    */
-  const JOJO: JOJOTYPE;
+  const JJ: JJTYPE;
   interface Window {
-    JOJO: JOJOTYPE;
+    JJ: JJTYPE;
     sensors: any;
     sensorsExpoSure: any;
     forceWebGL: boolean;

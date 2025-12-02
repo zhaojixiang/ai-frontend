@@ -1,21 +1,20 @@
 import { ErrorBlock } from 'antd-mobile';
 
-import jojoErrorFinding from '@/assets/images/jojo/error-finding.png';
-import jojoErrorNet from '@/assets/images/jojo/error-net.png';
-import jojoupErrorOthers from '@/assets/images/jojoup/error-others.png';
+import empty from '@/assets/images/empty.svg';
+import error from '@/assets/images/error.svg';
 
 export default (props: { status: 'empty' | 'error' }) => {
   const { status } = props || {};
 
-  let image = jojoErrorFinding;
+  let image = empty;
   let title = '未查询到数据哦';
 
   if (status === 'empty') {
-    image = JOJO.Os.jojoup ? jojoupErrorOthers : jojoErrorFinding;
+    image = empty;
     title = '未查询到数据哦';
   }
   if (status === 'error') {
-    image = JOJO.Os.jojoup ? jojoupErrorOthers : jojoErrorNet;
+    image = error;
     title = '错误';
   }
 

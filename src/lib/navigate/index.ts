@@ -11,9 +11,9 @@ import Os from '@/lib/os';
 import router from '@/routes';
 
 export interface NavigatorConfig {
-  // 跳转目标环境：mini（小程序）、externalWeb（外部H5）、flutter（Flutter页面）、native（原生页面）
-  to?: 'mini' | 'externalWeb' | 'flutter' | 'native';
-  // 跳转方式：navigate（跳转）、replace（替换），to === flutter | native 时，mode 无效
+  // 跳转目标环境：mini（小程序）、externalWeb（外部H5）
+  to?: 'mini' | 'externalWeb';
+  // 跳转方式：navigate（跳转）、replace（替换）
   mode?: 'navigate' | 'replace';
   // 跳转参数：以键值对形式传递的参数
   params?: Record<string, any>;
@@ -73,25 +73,7 @@ const navigate = (
       }
       break;
     }
-    case 'flutter':
-      // 叫叫儿童阅读 app中跳转 flutter 页面，传入H5页面完整url即可，会自动映射到 flutter 页面
-      if (Os.jojoReadApp) {
-        const resUrl = `${url}?${qs.stringify(params)}`;
-        window.location.href = `tinman-router://cn.tinman.jojoread/webview?url=${encodeURIComponent(
-          resUrl
-        )}`;
-      } else {
-        console.error('非叫叫儿童阅读 app 环境');
-      }
-      break;
-    case 'native':
-      // app中跳转 原生页面，需传入完整的 app url 例：tinman-router://cn.tinman.jojoread/home/course
-      if (Os.app) {
-        window.location.href = url;
-      } else {
-        console.error('非叫叫 app 环境');
-      }
-      break;
+
     default: {
       const finalUrl = mergeUrlAndParams(url, params);
       // 页面内路由跳转

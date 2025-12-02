@@ -1,18 +1,10 @@
-import storage from '@woulsl/storage';
-import session from '@woulsl/storage/session';
 import html2canvas from 'html2canvas';
 import qs from 'query-string';
 
 import { type CaptureOptions, type UrlToBase64Options } from './index.d';
 
 export const setupFavicon = () => {
-  const faviconMap: Record<string, string> = {
-    jojo: '/jojo_logo.png',
-    jojoup: '/jojoup_logo.png',
-    matrix: '/jojo_logo.png'
-  };
-
-  const faviconUrl = faviconMap[JOJO.Os.appName];
+  const faviconUrl = '/logo.png';
 
   // 删除现有的favicon
   const existingIcons = document.querySelectorAll("link[rel*='icon']");
@@ -60,133 +52,6 @@ export const filterEmptyParams = <T extends Record<string, any>>(params: T): Par
   });
 
   return filteredParams;
-};
-
-/**
- * 获取包名
- */
-export const getAppName = async () => {
-  let curBundleId = '';
-  if (JOJO.Os.app && JOJO.bridge.canUseBridge()) {
-    try {
-      const appInfo = await JOJO.bridge.appInfo();
-      const { data: { bundleID = '' } = {} } = appInfo || {};
-      curBundleId = bundleID?.toLowerCase();
-    } catch (error) {
-      console.log('bridge ready error', error);
-    }
-  }
-  return curBundleId;
-};
-
-/**
- * 是否是叫叫儿童阅读APP 鸿蒙版
- * @returns {boolean}
- */
-export const isJoJoReadAppForHM = async () => {
-  const appName = await getAppName();
-  return appName === 'com.shusheng.hm.jojoread';
-};
-
-/**
- * 比较版本号
- * @param version1 基准版本号
- * @param version2 比较版本号
- * @returns {boolean}
- */
-export const isHigerVersion = (version1: string, version2: string) => {
-  let isHigher = false;
-  if (version1 && version2) {
-    const newVersion1 = version1.split('.').map((el) => Number(el));
-    const newVersion2 = version2.split('.').map((el) => Number(el));
-    let diff = 0;
-    do {
-      isHigher =
-        diff === 2 ? newVersion2[diff] >= newVersion1[diff] : newVersion2[diff] > newVersion1[diff];
-      diff += 1;
-    } while (diff <= 2 && !isHigher && newVersion2[diff - 1] === newVersion1[diff - 1]);
-  }
-  return isHigher;
-};
-
-/**
- * 获取设备系统
- */
-export const getDeviceOS = async () => {
-  if (JOJO.Os.app) {
-    const deviceInfo = await JOJO.bridge.call('getDeviceInfo');
-    const { data } = deviceInfo || {};
-    return data?.deviceOS;
-  }
-  return '';
-};
-/**
- * 是否是IOS APP
- */
-export const isIosApp = async () => {
-  const deviceInfo = await getDeviceOS();
-  return deviceInfo === 'iOS';
-};
-
-/**
- * 是否是Android APP
- */
-export const isAndroidApp = async () => {
-  const deviceInfo = await getDeviceOS();
-  return deviceInfo === 'Android';
-};
-
-/**
- * 是否安装支付宝
- */
-export const getAliExist = async () => {
-  let alipayExist = true;
-  if (JOJO.Os.app && JOJO.bridge.canUseBridge()) {
-    try {
-      try {
-        const res = await JOJO.bridge.isAppInstalled({
-          packageName: 'com.eg.android.AlipayGphone',
-          urlScheme: 'alipays://'
-        });
-        console.log('aliRes', res);
-        const { status, data } = res || {};
-        if (!(status === 200 && data && data.isInstalled)) {
-          alipayExist = false;
-        }
-      } catch (error) {
-        alipayExist = false;
-        console.log('aliError', error);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  return alipayExist;
-};
-
-/**
- * 是否安装微信
- */
-export const getWxExist = async () => {
-  let wxExist = true;
-  if (JOJO.Os.app && JOJO.bridge.canUseBridge()) {
-    try {
-      try {
-        const res = await JOJO.bridge.isWechatInstalled();
-        console.log('wxRes', res);
-        const { status, data } = res || {};
-        if (!(status === 200 && data && data.isInstalled)) {
-          wxExist = false;
-        }
-      } catch (error) {
-        wxExist = false;
-        console.log('wxError', error);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  return wxExist;
 };
 
 /**
@@ -267,22 +132,34 @@ export const capture = async (
   }
 };
 
-export { session, storage };
+/**
+ * 获取当前系统枚举值
+ * @returns {string}
+ */
+export const getSystem = () => {
+  enum System {
+    IOS = 'IOS',
+    ANDROID = 'ANDROID',
+    HMOS = 'HMOS',
+    OTHER = 'OTHER'
+  }
+  const ua = navigator.userAgent.toLowerCase();
+  if (/android/.test(ua) && !/hmos/.test(ua)) {
+    return System.ANDROID;
+  } else if (/hmos/.test(ua)) {
+    return System.HMOS;
+  } else if (/iphone|ipad|ipod|ios|macintosh/.test(ua)) {
+    return System.IOS;
+  } else {
+    return System.OTHER;
+  }
+};
 
 export default {
   setupFavicon,
   getQuery,
   filterEmptyParams,
-  getDeviceOS,
-  isIosApp,
-  isAndroidApp,
-  getAppName,
-  isJoJoReadAppForHM,
-  isHigerVersion,
-  getAliExist,
-  getWxExist,
   urlToBase64,
   capture,
-  session,
-  storage
+  getSystem
 };

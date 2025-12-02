@@ -10,10 +10,8 @@ export const initDebugger = () => {
   const userId: any = Cookies.get('userId');
   const query = qs.parse(window.location.search);
   if (
-    ['dev', 'fat', 'uat'].includes(window.process.env.ENV_NAME) ||
-    (window.process.env.ENV_NAME === 'pro' &&
-      query.debug === 'true' &&
-      debuggerList.includes(userId))
+    ['test'].includes(import.meta.env.ENV_NAME) ||
+    (import.meta.env.ENV_NAME === 'pro' && query.debug === 'true' && debuggerList.includes(userId))
   ) {
     import('eruda').then((eruda) => eruda.default.init());
   }

@@ -8,14 +8,21 @@
   </head>
   <style>
     .loading-spinner {
-      position: fixed;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 200px;
-      height: 150px;
-      background: url('/src/assets/images/jojo/loadingV2.gif') no-repeat center/cover;
+      margin: 36vh auto;
+      display: block;
+      width: 40px;
+      height: 40px;
+      background: url('/public/loading.svg') no-repeat center/cover;
       z-index: 9999;
+      animation: rotate 4s linear infinite;
+    }
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
     }
   </style>
   <body>

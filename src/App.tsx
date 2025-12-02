@@ -3,14 +3,14 @@ import './style/global.less';
 
 import { Outlet } from 'react-router-dom';
 
-import { Os } from '@/lib';
-import DebugTool from '@/lib/debugger/DebugTool';
+// import { Os } from '@/lib';
+// import DebugTool from '@/lib/debugger/DebugTool';
 
 function App() {
   return (
     <>
       <Outlet />
-      {Os.debug && <DebugTool />}
+      {/* {Os.debug && <DebugTool />} */}
     </>
   );
 }
