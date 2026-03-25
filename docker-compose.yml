@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ENV_BASE: ${ENV_BASE:-/}
+        ENV_NAME: ${ENV_NAME:-pro}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    restart: unless-stopped

@@ -1,0 +1,64 @@
+/* 切片区域外的顶部点击条，用于切换播放时间点（与拖拽区域相似） */
+.seekStrip {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.deleteBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #e53935;
+  }
+}
+
+.progressBar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: red;
+  pointer-events: none;
+  z-index: 10;
+  .progressBar_top {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 20px;
+    background: red;
+    cursor: grab;
+    pointer-events: auto;
+  }
+  .progressBar_bottom {
+    position: absolute;
+    top: -0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: red;
+    pointer-events: none;
+  }
+}

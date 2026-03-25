@@ -7,7 +7,6 @@ import { RouterProvider } from 'react-router-dom';
 import { initJJ } from '@/lib/initJJ';
 import { setupFavicon } from '@/lib/utils';
 
-import AppWrapper from './components/AppWrapper';
 import { initDebugger } from './lib/debugger';
 import router from './routes';
 
@@ -26,9 +25,5 @@ initJJ().then(() => {
     serviceHost: window.location.origin + '/_AMapService'
   };
 
-  createRoot(document.getElementById('root')!).render(
-    <AppWrapper>
-      <RouterProvider router={router} />
-    </AppWrapper>
-  );
+  createRoot(document.getElementById('root')!).render(<RouterProvider router={router} />);
 });

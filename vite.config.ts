@@ -1,6 +1,5 @@
 import legacy from '@vitejs/plugin-legacy';
 import path from 'path';
-import pxtovw from 'postcss-px-to-viewport';
 import type { ConfigEnv, UserConfig } from 'vite';
 import { defineConfig } from 'vite';
 import eslint from 'vite-plugin-eslint';
@@ -8,6 +7,7 @@ import eslint from 'vite-plugin-eslint';
 // https://vite.dev/config/
 export default defineConfig(({ command }: ConfigEnv): UserConfig => {
   let config: UserConfig = {
+    envPrefix: ['VITE_', 'ENV_'],
     clearScreen: false,
     optimizeDeps: {
       esbuildOptions: {
@@ -20,75 +20,50 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
     plugins: [
       eslint({
         fix: true,
-        lintOnStart: true, // 启动时检查（新增选项）
+        lintOnStart: true,
         include: 'src/**/*.{js,jsx,ts,tsx}',
         exclude: ['**/node_modules/**', '**/dist/**', '**/*.d.ts'],
-        emitWarning: true, // 开发模式推荐
-        emitError: command === 'build' // 构建时严格报错
+        emitWarning: true,
+        emitError: command === 'build'
       }),
       legacy({
         targets: [
-          'Android >= 39',
-          'Chrome >= 50',
-          'Safari >= 10.1',
-          'iOS >= 10.3',
+          'Chrome >= 64',
+          'Edge >= 79',
+          'Firefox >= 67',
+          'Safari >= 12',
           '> 1%',
-          'ie >= 11'
+          'not dead'
         ],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime']
       })
     ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src') // 将 @ 映射到 src 目录
+        '@': path.resolve(__dirname, './src')
       }
     },
     css: {
-      postcss: {
-        plugins: [
-          pxtovw({
-            unitToConvert: 'px', // 要转换的单位
-            viewportWidth: 375, // 设计稿的视口宽度，一般是375(iPhone6)或750
-            unitPrecision: 5, // 转换后的精度，即小数点位数
-            propList: ['*'], // 能转化为vw的属性列表
-            viewportUnit: 'vw', // 希望使用的视口单位
-            fontViewportUnit: 'vw', // 字体使用的视口单位
-            selectorBlackList: [], // 需要忽略的CSS选择器
-            minPixelValue: 1, // 最小的转换数值
-            mediaQuery: false, // 是否转换媒体查询中的px
-            replace: true, // 是否直接替换属性值
-            exclude: [/node_modules/], // 忽略某些文件夹下的文件
-            // include: undefined, // 如果设置了include，那将只有匹配到的文件才会被转换
-            landscape: false, // 是否添加根据landscapeWidth生成的媒体查询条件
-            landscapeUnit: 'vw', // 横屏时使用的单位
-            landscapeWidth: 1334 // 横屏时使用的视口宽度
-          })
-        ]
-      },
+      // 移除 postcss-px-to-viewport 插件，PC端不需要px转vw
       preprocessorOptions: {
         less: {
           javascriptEnabled: true
         }
       }
     },
-
     build: {
       sourcemap: process.env?.ENV_NAME === 'test',
       target: 'es2015',
-      minify: 'terser',
-      chunkSizeWarningLimit: 500,
-      assetsInlineLimit: 0,
+      minify: 'esbuild',
+      chunkSizeWarningLimit: 1000, // PC端可以适当提高chunk大小限制
+      assetsInlineLimit: 4096, // 4kb以下文件转base64
       rollupOptions: {
         context: 'window',
-        // plugins: [
-        //   url({
-        //     include: ['**/*.svga']
-        //   })
-        // ],
         output: {
           manualChunks: {
             react: ['react', 'react-dom'],
-            antdMobile: ['antd-mobile']
+            antdMobile: ['antd'],
+            vendor: ['lodash-es', 'dayjs', 'axios']
           }
         }
       }
@@ -106,16 +81,15 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
         fs: {
           strict: true
         },
-        open: false,
+        open: true, // PC端开发自动打开浏览器
         host: '0.0.0.0',
         proxy: {
           '/api/user-center/manage': {
             target: `https://mall.fat.tinman.cn`,
             changeOrigin: true
-            // rewrite: (path) => path.replace(/^\/api/, '')
           }
         },
-        port: 3001
+        port: 3000 // PC端使用默认3000端口
       }
     };
   }
@@ -123,7 +97,6 @@ export default defineConfig(({ command }: ConfigEnv): UserConfig => {
   // 构建之后生效
   if (command === 'build') {
     Object.keys(process.env).forEach((item) => {
-      // 注入外部变量
       const whiteKeys = ['ENV_NAME'];
       if (whiteKeys.includes(item)) {
         process.env[`VITE_${item}`] = process.env[item];

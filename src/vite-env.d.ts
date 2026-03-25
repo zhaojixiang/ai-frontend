@@ -1,10 +1,21 @@
 /// <reference types="vite/client" />
+
 import { type ToastShowProps } from 'antd-mobile';
 import { type AxiosRequestConfig } from 'axios';
 
 import { type NavigatorConfig } from './lib/navigate';
 import { type OS } from './lib/os/index.d';
 import { type Utils } from './lib/utils/index.d';
+
+interface ImportMetaEnv {
+  readonly ENV_BASE?: string;
+  readonly ENV_NAME?: string;
+  readonly VITE_API_BASE_URL?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
 
 // 扩展 Axios 类型
 declare module 'axios' {
