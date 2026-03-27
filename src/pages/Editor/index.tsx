@@ -112,7 +112,7 @@ export default function Editor() {
 
   return (
     <div style={{ padding: 20, background: '#0f0f0f', color: '#fff' }}>
-      <h2>🎬 AI 视频编辑器</h2>
+      <h2>🎬 AI 视频编辑器 V1.0</h2>
 
       <VideoUrlForm
         value={url}
